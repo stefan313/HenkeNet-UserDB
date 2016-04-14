@@ -155,7 +155,7 @@ public class MainControl {
                 //this.mainView.getTextAreaFehler().append("Found id"+ accountIDupdate+".\n");
                 mail =set.getString("email");
                 passwrd = set.getString("password");
-                fullname = set.getString("surname, givenname");
+                fullname = set.getString("surname") + ", " + set.getString("givenname");
                 username = set.getString("username");
                 count++;
             }
