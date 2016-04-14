@@ -92,8 +92,8 @@ public class MainControl {
             }
             //Daten zur DB senden
             //Insert Username and Pw
-            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO `users` (`username`, `password`, `room`, `real_name`, `email`, `expiration_date`) "
-                    + "VALUES ('" + username + "', '" + password + "', '" + roomnumber + "', " + ((nachname.length()==0 || vorname.length() ==0) ? "NULL": "'" + nachname + ", " + vorname + "'") + ", "
+            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO `users` (`username`, `password`, `room`, `surname`, `givenname`, `email`, `expiration_date`) "
+                    + "VALUES ('" + username + "', '" + password + "', '" + roomnumber + "', " + ((nachname.length()==0 || vorname.length() ==0) ? "NULL": "'" + nachname + "', '" + vorname + "'") + ", "
                     +  (email.length()==0 ? "NULL": "'" +email + "'") + ", '" + expyDate + "');");
             preparedStatement.executeUpdate();
 
@@ -129,7 +129,7 @@ public class MainControl {
                 if(!first){
                     statement += " AND ";
                 } 
-                statement += "real_name LIKE '%" + name +"%'";
+                statement += "(surname LIKE '%" + name +"%' OR givenname LIKE '%" + name + "%')";
                 first = false;
             }
              
@@ -155,7 +155,7 @@ public class MainControl {
                 //this.mainView.getTextAreaFehler().append("Found id"+ accountIDupdate+".\n");
                 mail =set.getString("email");
                 passwrd = set.getString("password");
-                fullname = set.getString("real_name");
+                fullname = set.getString("surname, givenname");
                 username = set.getString("username");
                 count++;
             }
@@ -207,7 +207,7 @@ public class MainControl {
             String statement = "UPDATE users SET ";
             
             statement += "username='"+user+"',";
-            statement += "real_name=" + (name.length()==0 ? "NULL" : "'"+name+"'")+",";
+            statement += "surname=" + (name.length()==0 ? "NULL" : "'"+name+"'")+",";
             statement += "password='"+passwd+"',";
             statement += "email="+(email.length()==0 ? "NULL" : "'" +email+"'");
             
