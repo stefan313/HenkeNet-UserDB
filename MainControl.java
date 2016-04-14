@@ -27,7 +27,7 @@ public class MainControl {
     
     Connection connection;
     
-
+    User currentUser;
     
     MainControl(){
         //Show Login Form
@@ -92,12 +92,7 @@ public class MainControl {
             }
             //Daten zur DB senden
             //Insert Username and Pw
-            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO `users` (`username`, `password`, `room`, `surname`, `givenname`, `email`, `expiration_date`) "
-                    + "VALUES ('" + username + "', '" + password + "', '" + roomnumber + "', " + ((nachname.length()==0 || vorname.length() ==0) ? "NULL": "'" + nachname + "', '" + vorname + "'") + ", "
-                    +  (email.length()==0 ? "NULL": "'" +email + "'") + ", '" + expyDate + "');");
-            preparedStatement.executeUpdate();
-
-            preparedStatement.close();
+            new User(username, password, roomnumber, nachname, vorname, email, expyDate).insert(connection);
             this.mainView.getTextAreaFehler().append("--------------------\nSUCCESS\n--------------------\n");
         } catch (SQLException ex) {
             this.mainView.getTextAreaFehler().append("Dupiclate entry:\n" + ex.getLocalizedMessage() + "\n");
@@ -149,14 +144,17 @@ public class MainControl {
             ResultSet set = preparedStatement.executeQuery();
             int count = 0;
             
-            String username = "", mail="", passwrd="", fullname="";
             while(set.next()){
-                accountIDupdate = Integer.parseInt(set.getString("id"));
-                //this.mainView.getTextAreaFehler().append("Found id"+ accountIDupdate+".\n");
-                mail =set.getString("email");
-                passwrd = set.getString("password");
-                fullname = set.getString("surname") + ", " + set.getString("givenname");
-                username = set.getString("username");
+            	currentUser = new User(
+            			set.getString("username"),
+            			set.getString("password"),
+            			set.getString("room"),
+            			set.getString("surname"),
+            			set.getString("givenname"),
+            			set.getString("email"),
+            			set.getString("expiration_date")
+            			);
+                currentUser.setUID(Integer.parseInt(set.getString("id")));
                 count++;
             }
             if(count==0){
@@ -168,15 +166,15 @@ public class MainControl {
                 this.mainView.getTextAreaFehler().append(count +" entries found. Please fill in more search parameters.\n");
                 return;
             }
-             
+            
             preparedStatement.close();
             this.mainView.getTextAreaFehler().append("--------------------\nSUCCESS\n--------------------\n");
             
-            mainView.getTextFieldEMailUpdate().setText(mail);
-            mainView.getTextFieldRealNameUpdate().setText(fullname);
-            mainView.getTextUserNameUpdate().setText(username);
-            mainView.getPasswordFieldUpdate().setText(passwrd);
-            mainView.getPasswordFieldUpdateCheck().setText(passwrd);
+            mainView.getTextFieldEMailUpdate().setText(currentUser.email);
+            mainView.getTextFieldRealNameUpdate().setText(currentUser.givenname + " " + currentUser.surname);
+            mainView.getTextUserNameUpdate().setText(currentUser.username);
+            mainView.getPasswordFieldUpdate().setText(currentUser.password);
+            mainView.getPasswordFieldUpdateCheck().setText(currentUser.password);
             enableEditSection(true);
             
         } catch (SQLException ex) {
@@ -202,24 +200,12 @@ public class MainControl {
                 this.mainView.getTextAreaFehler().append("Passwords are not equal!\n");
                 return;
             }
-            
-            
-            String statement = "UPDATE users SET ";
-            
-            statement += "username='"+user+"',";
-            statement += "surname=" + (name.length()==0 ? "NULL" : "'"+name+"'")+",";
-            statement += "password='"+passwd+"',";
-            statement += "email="+(email.length()==0 ? "NULL" : "'" +email+"'");
-            
-            statement += " WHERE id="+accountIDupdate+";";
-           
-            
-            //Daten zur DB senden
-            //Insert Username and Pw
-            PreparedStatement preparedStatement = connection.prepareStatement(statement);
-            preparedStatement.executeUpdate();
-            preparedStatement.close();
-            
+             
+            currentUser.username = user;
+            currentUser.surname = name;
+            currentUser.password = passwd;
+            currentUser.email = email;
+            currentUser.update(connection);
             
             this.mainView.getTextAreaFehler().append("--------------------\nSUCCESS\n--------------------\n");
             enableEditSection(false);

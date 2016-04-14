@@ -28,7 +28,7 @@ public class User {
 	private int user_id;
 	private boolean isModified;
 	
-	public User(String u, String p, String s, String g, String r, String e, String d) {
+	public User(String u, String p, String r, String s, String g, String e, String d) {
 		username = u;
 		password = p;
 		surname = s;
@@ -48,16 +48,43 @@ public class User {
 		// TODO: add getter function
 	}
 	
+	public void setUID(int uid) {
+		user_id = uid;
+	}
 	
 	// synchronise user object with database
-	public void sync(Connection connection) throws SQLException {
-        //Daten zur DB senden
-        //Insert Username and Pw
-        PreparedStatement preparedStatement = connection.prepareStatement(prepareUpdateStatement());
+	public void update(Connection connection) throws SQLException {
+		String statement = prepareUpdateStatement();
+		System.out.println("[SQL] " + statement + "\n");
+        PreparedStatement preparedStatement = connection.prepareStatement(statement);
         preparedStatement.executeUpdate();
         preparedStatement.close();	
         
 		isModified = false;
+	}
+	
+	public void insert(Connection connection) throws SQLException {
+		String statement = prepareInsertStatement();
+		System.out.println("[SQL] " + statement + "\n");
+        PreparedStatement preparedStatement = connection.prepareStatement(statement);
+        preparedStatement.executeUpdate();
+        preparedStatement.close();	
+        
+		isModified = false;
+	}
+	
+	private String prepareInsertStatement() {
+        String statement = "INSERT INTO users SET ";
+        
+        statement += "username='"+username+"',";
+        statement += "password='"+password+"',";
+        statement += "room='"+room+"',";
+        statement += "surname='"+surname+"',";
+        statement += "givenname='"+givenname+"',";
+        statement += "email='"+email+"',";
+        statement += "expiration_date='"+expirationDate+"';";
+        
+        return statement;
 	}
 	
 	private String prepareUpdateStatement() {
@@ -69,7 +96,12 @@ public class User {
         statement += "surname='"+surname+"',";
         statement += "givenname='"+givenname+"',";
         statement += "email='"+email+"',";
-        statement += "expiration_date='"+expirationDate+"'";
+        
+        statement += "expiration_date=" +
+        		(expirationDate == null
+        				? "NULL"
+        				: "'" + expirationDate + "'"
+        				);
         
         statement += " WHERE id="+user_id+";";
 		
