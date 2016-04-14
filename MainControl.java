@@ -21,6 +21,7 @@ public class MainControl {
     private MainView mainView;
     private LoginForm loginView;
     private MysqlDataSource dataSource;
+    private final static Logger LOG = Logger.getLogger(MainControl.class.getName());
 
     //id of the account which is edited
     private int accountIDupdate;
@@ -55,7 +56,7 @@ public class MainControl {
             enableEditSection(false);
             mainView.setVisible(true);
         } catch (SQLException ex) {
-            Logger.getLogger(MainControl.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, null, ex);
             loginView.gettxtStatus().setText("ERROR:" + ex.getMessage());
         }
     }
@@ -244,7 +245,7 @@ public class MainControl {
         try {
             connection.close();
         } catch (SQLException ex) {
-            Logger.getLogger(MainControl.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, null, ex);
         }
     }
 
