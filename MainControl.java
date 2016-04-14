@@ -57,7 +57,6 @@ public class MainControl {
             mainView.setVisible(true);
         } catch (SQLException ex) {
             LOG.log(Level.SEVERE, null, ex);
-            loginView.gettxtStatus().setText("ERROR:" + ex.getMessage());
         }
     }
         
@@ -67,7 +66,7 @@ public class MainControl {
             if (this.mainView.getTextFieldRoomNumber1().getText().length() != 2
                     || this.mainView.getTextFieldRoomNumber2().getText().length() != 2
                     || this.mainView.getTextFieldRoomNumber3().getText().length() != 2) {
-                this.mainView.getTextAreaFehler().append("Review room number!\n");
+                //TODO: this.mainView.getTextAreaFehler().append("Review room number!\n");
                 return;
             }
 
@@ -83,20 +82,20 @@ public class MainControl {
                     expyDate = "2016-04-16";
             //Daten checken
             if (!password.equals(String.valueOf(this.mainView.getPasswordFieldCheck().getPassword()))) {
-                this.mainView.getTextAreaFehler().append("Passwords are not equal!\n");
+                //TODO: this.mainView.getTextAreaFehler().append("Passwords are not equal!\n");
                 return;
             }
             if (password.equalsIgnoreCase("")
                     || username.equalsIgnoreCase("")) {
-                this.mainView.getTextAreaFehler().append("Nicht alles ausgefüllt!\n");
+                //TODO: this.mainView.getTextAreaFehler().append("Nicht alles ausgefüllt!\n");
                 return;
             }
             //Daten zur DB senden
             //Insert Username and Pw
             new User(username, password, roomnumber, nachname, vorname, email, expyDate).insert(connection);
-            this.mainView.getTextAreaFehler().append("--------------------\nSUCCESS\n--------------------\n");
+            //TODO: this.mainView.getTextAreaFehler().append("--------------------\nSUCCESS\n--------------------\n");
         } catch (SQLException ex) {
-            this.mainView.getTextAreaFehler().append("Dupiclate entry:\n" + ex.getLocalizedMessage() + "\n");
+            LOG.log(Level.WARNING, "[FAIL] " + ex.getLocalizedMessage(), ex);
         }
     }
 
@@ -109,7 +108,7 @@ public class MainControl {
                     roomnr = mainView.getTextFieldRoomSearch().getText();
             
             if(user.equals("") && name.equals("") && roomnr.equals("")){
-                this.mainView.getTextAreaFehler().append("Please fill at least on search field.\n");
+                //TODO: this.mainView.getTextAreaFehler().append("Please fill at least on search field.\n");
                 return;
             }
             
@@ -159,17 +158,17 @@ public class MainControl {
                 count++;
             }
             if(count==0){
-                this.mainView.getTextAreaFehler().append("No entry found.\n");
+                //TODO: this.mainView.getTextAreaFehler().append("No entry found.\n");
                 return;
             }
             
              if(count>1){
-                this.mainView.getTextAreaFehler().append(count +" entries found. Please fill in more search parameters.\n");
+                //TODO: this.mainView.getTextAreaFehler().append(count +" entries found. Please fill in more search parameters.\n");
                 return;
             }
             
             preparedStatement.close();
-            this.mainView.getTextAreaFehler().append("--------------------\nSUCCESS\n--------------------\n");
+            //TODO: this.mainView.getTextAreaFehler().append("--------------------\nSUCCESS\n--------------------\n");
             
             mainView.getTextFieldEMailUpdate().setText(currentUser.email);
             mainView.getTextFieldRealNameUpdate().setText(currentUser.givenname + " " + currentUser.surname);
@@ -179,7 +178,7 @@ public class MainControl {
             enableEditSection(true);
             
         } catch (SQLException ex) {
-            this.mainView.getTextAreaFehler().append("ERROR:\n" + ex.getLocalizedMessage() + "\n");
+            LOG.log(Level.WARNING, "[FAIL] " + ex.getLocalizedMessage(), ex);
         }
     }
     
@@ -193,12 +192,12 @@ public class MainControl {
                     email = mainView.getTextFieldEMailUpdate().getText();
             
             if(user.equals("") || passwd.equals("")){
-                this.mainView.getTextAreaFehler().append("Please fill in username and password.\n");
+                //TODO: this.mainView.getTextAreaFehler().append("Please fill in username and password.\n");
                 return;
             }
             
              if (!passwd.equals(passwdchk)) {
-                this.mainView.getTextAreaFehler().append("Passwords are not equal!\n");
+                //TODO: this.mainView.getTextAreaFehler().append("Passwords are not equal!\n");
                 return;
             }
              
@@ -208,11 +207,11 @@ public class MainControl {
             currentUser.email = email;
             currentUser.update(connection);
             
-            this.mainView.getTextAreaFehler().append("--------------------\nSUCCESS\n--------------------\n");
+            //TODO: this.mainView.getTextAreaFehler().append("--------------------\nSUCCESS\n--------------------\n");
             enableEditSection(false);
             
         } catch (SQLException ex) {
-            this.mainView.getTextAreaFehler().append("ERROR:\n" + ex.getLocalizedMessage() + "\n");
+            LOG.log(Level.WARNING, "[FAIL] " + ex.getLocalizedMessage(), ex);
         }
     }
     
