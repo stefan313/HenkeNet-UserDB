@@ -23,10 +23,8 @@ public class MainControl {
 
     private MainView mainView;
     private LoginForm loginView;
-    private MysqlDataSource dataSource;
+    private MySQLDataLink dataSource;
     private final static Logger LOG = Logger.getLogger(MainControl.class.getName());
-    
-    Connection connection;
     
     User currentUser;
     
@@ -43,21 +41,21 @@ public class MainControl {
     
     void trylogin(){
         //zur DB verbinden
-        dataSource = new MysqlDataSource();
-        dataSource.setUser(loginView.getTxtUser().getText());
-        dataSource.setPassword(String.valueOf(loginView.getTxtPassword().getPassword()));
-        dataSource.setServerName("shelldon");
-        dataSource.setDatabaseName("radius");
-        try {
-            connection = dataSource.getConnection();
-            loginView.setVisible(false);
-            mainView = new MainView(this);
-            enableEditSection(false);
-            mainView.setVisible(true);
-            LOG.addHandler(new StatusBar());
-        } catch (SQLException ex) {
-            LOG.log(Level.SEVERE, null, ex);
-        }
+        dataSource = new MySQLDataLink(
+                "shelldon",
+                "radius",
+                loginView.getTxtUser().getText(),
+                String.valueOf(loginView.getTxtPassword().getPassword())
+        );
+        
+        if (!(dataSource.connect())) return;
+
+        loginView.setVisible(false);
+        mainView = new MainView(this);
+        enableEditSection(false);
+        mainView.setVisible(true);
+        LOG.addHandler(new StatusBar());
+
     }
         
     void commit() {
@@ -92,7 +90,7 @@ public class MainControl {
             }
             //Daten zur DB senden
             //Insert Username and Pw
-            new User(username, password, roomnumber, nachname, vorname, email, expyDate).insert(connection);
+            new User(username, password, roomnumber, nachname, vorname, email, expyDate).insert(dataSource.getConnection());
             LOG.info("[SUCCESS] Added user '" + username + "'");
         } catch (SQLException ex) {
             LOG.log(Level.WARNING, "[FAIL] " + ex.getLocalizedMessage(), ex);
@@ -140,7 +138,7 @@ public class MainControl {
             
             //Daten zur DB senden
             //Insert Username and Pw
-            PreparedStatement preparedStatement = connection.prepareStatement(statement);
+            PreparedStatement preparedStatement = dataSource.getConnection().prepareStatement(statement);
             ResultSet set = preparedStatement.executeQuery();
             int count = 0;
             
@@ -208,7 +206,7 @@ public class MainControl {
             currentUser.givenname = givenname;
             currentUser.password = passwd;
             currentUser.email = email;
-            currentUser.update(connection);
+            currentUser.update(dataSource.getConnection());
             
             LOG.info("[SUCCESS] Updated user '" + currentUser.username + "'");
             enableEditSection(false);
@@ -245,11 +243,7 @@ public class MainControl {
     }
     
     public void closeConn(){
-        try {
-            connection.close();
-        } catch (SQLException ex) {
-            LOG.log(Level.SEVERE, null, ex);
-        }
+        dataSource.disconnect();
     }
 
     public class StatusBar extends StreamHandler {
