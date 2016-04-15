@@ -3,14 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
+
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
+import java.awt.Color;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.StreamHandler;
+import java.util.logging.LogRecord;
 
 /**
  *
@@ -22,20 +25,16 @@ public class MainControl {
     private LoginForm loginView;
     private MysqlDataSource dataSource;
     private final static Logger LOG = Logger.getLogger(MainControl.class.getName());
-
-    //id of the account which is edited
-    private int accountIDupdate;
     
     Connection connection;
     
     User currentUser;
     
     MainControl(){
-        //Show Login Form
+        // DEBUG
+        LOG.setLevel(Level.INFO);
         loginView = new LoginForm(this);
         loginView.setVisible(true);
-        
-        
     }
 
     public static void main(String[] args){
@@ -55,6 +54,7 @@ public class MainControl {
             mainView = new MainView(this);
             enableEditSection(false);
             mainView.setVisible(true);
+            LOG.addHandler(new StatusBar());
         } catch (SQLException ex) {
             LOG.log(Level.SEVERE, null, ex);
         }
@@ -66,7 +66,7 @@ public class MainControl {
             if (this.mainView.getTextFieldRoomNumber1().getText().length() != 2
                     || this.mainView.getTextFieldRoomNumber2().getText().length() != 2
                     || this.mainView.getTextFieldRoomNumber3().getText().length() != 2) {
-                //TODO: this.mainView.getTextAreaFehler().append("Review room number!\n");
+                LOG.log(Level.WARNING, "Review room number.");
                 return;
             }
 
@@ -82,18 +82,18 @@ public class MainControl {
                     expyDate = "2016-04-16";
             //Daten checken
             if (!password.equals(String.valueOf(this.mainView.getPasswordFieldCheck().getPassword()))) {
-                //TODO: this.mainView.getTextAreaFehler().append("Passwords are not equal!\n");
+                LOG.log(Level.WARNING, "Passwords do not match.");
                 return;
             }
             if (password.equalsIgnoreCase("")
                     || username.equalsIgnoreCase("")) {
-                //TODO: this.mainView.getTextAreaFehler().append("Nicht alles ausgefüllt!\n");
+                LOG.log(Level.WARNING, "Password is empty.");
                 return;
             }
             //Daten zur DB senden
             //Insert Username and Pw
             new User(username, password, roomnumber, nachname, vorname, email, expyDate).insert(connection);
-            //TODO: this.mainView.getTextAreaFehler().append("--------------------\nSUCCESS\n--------------------\n");
+            LOG.info("--------------------SUCCESS--------------------");
         } catch (SQLException ex) {
             LOG.log(Level.WARNING, "[FAIL] " + ex.getLocalizedMessage(), ex);
         }
@@ -108,7 +108,7 @@ public class MainControl {
                     roomnr = mainView.getTextFieldRoomSearch().getText();
             
             if(user.equals("") && name.equals("") && roomnr.equals("")){
-                //TODO: this.mainView.getTextAreaFehler().append("Please fill at least on search field.\n");
+                LOG.log(Level.WARNING, "Please fill at least one search field.");
                 return;
             }
             
@@ -158,17 +158,17 @@ public class MainControl {
                 count++;
             }
             if(count==0){
-                //TODO: this.mainView.getTextAreaFehler().append("No entry found.\n");
+                LOG.log(Level.WARNING, "No entry found.");
                 return;
             }
             
              if(count>1){
-                //TODO: this.mainView.getTextAreaFehler().append(count +" entries found. Please fill in more search parameters.\n");
+                LOG.log(Level.WARNING, count +" entries found. Please fill in more search parameters.");
                 return;
             }
             
             preparedStatement.close();
-            //TODO: this.mainView.getTextAreaFehler().append("--------------------\nSUCCESS\n--------------------\n");
+            LOG.info("--------------------SUCCESS--------------------");
             
             mainView.getTextFieldEMailUpdate().setText(currentUser.email);
             mainView.getTextFieldRealNameUpdate().setText(currentUser.givenname + " " + currentUser.surname);
@@ -192,12 +192,12 @@ public class MainControl {
                     email = mainView.getTextFieldEMailUpdate().getText();
             
             if(user.equals("") || passwd.equals("")){
-                //TODO: this.mainView.getTextAreaFehler().append("Please fill in username and password.\n");
+                LOG.log(Level.WARNING, "[FAIL] " + "Please fill in username and password.");
                 return;
             }
             
              if (!passwd.equals(passwdchk)) {
-                //TODO: this.mainView.getTextAreaFehler().append("Passwords are not equal!\n");
+                LOG.log(Level.WARNING, "[FAIL] " + "Passwords do not match.");
                 return;
             }
              
@@ -207,7 +207,7 @@ public class MainControl {
             currentUser.email = email;
             currentUser.update(connection);
             
-            //TODO: this.mainView.getTextAreaFehler().append("--------------------\nSUCCESS\n--------------------\n");
+            LOG.info("--------------------SUCCESS--------------------");
             enableEditSection(false);
             
         } catch (SQLException ex) {
@@ -248,4 +248,13 @@ public class MainControl {
         }
     }
 
+    public class StatusBar extends StreamHandler {
+        public void publish(LogRecord rec) {
+            mainView.getStatusBar().setText(rec.getMessage());
+            if (rec.getLevel().intValue() >= Level.SEVERE.intValue())
+                mainView.getStatusBar().setForeground(Color.RED);
+            else
+                mainView.getStatusBar().setForeground(Color.BLACK);
+        }
+    }
 }

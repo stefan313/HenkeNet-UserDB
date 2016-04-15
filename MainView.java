@@ -105,6 +105,7 @@ private MainControl control;
         textFieldUserNameUpdate = new javax.swing.JTextField();
         jPanel3 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
+        txtStatusBar = new javax.swing.JLabel();
 
         jTextField1.setText("jTextField1");
 
@@ -427,6 +428,10 @@ private MainControl control;
         jPanel6.setBorder(javax.swing.BorderFactory.createBevelBorder(1));
         jPanel6.setLayout(new java.awt.BorderLayout());
 
+        txtStatusBar.setName("txtStatusBar"); // NOI18N
+        jPanel6.add(txtStatusBar, java.awt.BorderLayout.CENTER);
+        txtStatusBar.getAccessibleContext().setAccessibleName("txtStatusBar");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -537,6 +542,7 @@ private MainControl control;
     private javax.swing.JTextField textFieldUsername;
     private javax.swing.JTextField textFieldUsernameSearch;
     private javax.swing.JTextField textFieldVorname;
+    private javax.swing.JLabel txtStatusBar;
     // End of variables declaration//GEN-END:variables
 
     public JTextField getTextFieldEMail() {
@@ -615,6 +621,8 @@ private MainControl control;
         return textFieldUserNameUpdate;
     }
     
-    
+    public javax.swing.JLabel getStatusBar() {
+        return txtStatusBar;
+    }
     
 }
