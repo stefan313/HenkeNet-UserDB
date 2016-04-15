@@ -4,12 +4,7 @@
  * and open the template in the editor.
  */
 
-import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 import java.awt.Color;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.StreamHandler;
@@ -97,18 +92,8 @@ public class MainControl {
 
     
     void commitSearch() {
-            //Daten aus mainView holen
-            String user = mainView.getTextFieldUsernameSearch().getText(); /*,
-                    name = mainView.getTextFieldNachnameSearch().getText(),
-                    roomnr = mainView.getTextFieldRoomSearch().getText();
-            
-            if(user.equals("") && name.equals("") && roomnr.equals("")){
-                LOG.log(Level.WARNING, "[FAIL] Please fill at least one search field.");
-                return;
-            }*/
-            
-            // nur mal zum testen
-            ArrayList<User> result = dataSource.lookupUser(user);
+            ArrayList<User> result = dataSource.lookupUser(
+                    mainView.getTextFieldUsernameSearch().getText());
             if (result.isEmpty()) {
                 LOG.info("No hits.");
                 return;
@@ -123,63 +108,6 @@ public class MainControl {
             
             LOG.info("[SQL] Found " + result.size() + " users.");
             currentUser = result.get(0);
-            
-//            String statement = "SELECT * FROM users WHERE ";
-//            boolean first = true;
-//            if(user.length()>1){
-//                statement += "username='"+user+"'";
-//                first = false;
-//            }
-//           
-//            if(name.length()>0){
-//                if(!first){
-//                    statement += " AND ";
-//                } 
-//                statement += "(surname LIKE '%" + name +"%' OR givenname LIKE '%" + name + "%')";
-//                first = false;
-//            }
-//             
-//            if(roomnr.length()>0){
-//                if(!first){
-//                    statement += " AND ";
-//                } 
-//                statement += "room='" + roomnr +"'";
-//            }
-//            
-//            //Terminate statemnt
-//            statement += ";";
-//            
-//            //Daten zur DB senden
-//            //Insert Username and Pw
-//            PreparedStatement preparedStatement = dataSource.getConnection().prepareStatement(statement);
-//            ResultSet set = preparedStatement.executeQuery();
-//            int count = 0;
-//            
-//            while(set.next()){
-//            	currentUser = new User(
-//            			set.getString("username"),
-//            			set.getString("password"),
-//            			set.getString("room"),
-//            			set.getString("surname"),
-//            			set.getString("givenname"),
-//            			set.getString("email"),
-//            			set.getString("expiration_date")
-//            			);
-//                currentUser.setUID(Integer.parseInt(set.getString("id")));
-//                count++;
-//            }
-//            if(count==0){
-//                LOG.log(Level.WARNING, "[FAIL] No entry found.");
-//                return;
-//            }
-//            
-//             if(count>1){
-//                LOG.log(Level.WARNING, count +" entries found. Please fill in more search parameters.");
-//                return;
-//            }
-//            
-//            preparedStatement.close();
-//            LOG.info("[SUCCESS] Found user '" + currentUser.username + "'");
             
             mainView.getTextFieldEMailUpdate().setText(currentUser.email);
             mainView.getTextFieldGivenNameUpdate().setText(currentUser.givenname);
