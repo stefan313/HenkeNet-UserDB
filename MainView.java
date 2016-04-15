@@ -100,9 +100,10 @@ private MainControl control;
         ButtonCancelUpdate = new javax.swing.JButton();
         ButtonCommitUpdate1 = new javax.swing.JButton();
         jLabel20 = new javax.swing.JLabel();
-        textFieldRealNameUpdate = new javax.swing.JTextField();
+        textFieldGivenNameUpdate = new javax.swing.JTextField();
         jLabel21 = new javax.swing.JLabel();
         textFieldUserNameUpdate = new javax.swing.JTextField();
+        textFieldSurNameUpdate = new javax.swing.JTextField();
         jPanel3 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         txtStatusBar = new javax.swing.JLabel();
@@ -358,8 +359,11 @@ private MainControl control;
                             .addComponent(jLabel21))
                         .addGap(23, 23, 23)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(textFieldRealNameUpdate)
-                            .addComponent(textFieldUserNameUpdate))))
+                            .addComponent(textFieldUserNameUpdate)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(textFieldGivenNameUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(textFieldSurNameUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -385,8 +389,9 @@ private MainControl control;
                 .addComponent(jLabel19)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(textFieldRealNameUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel20))
+                    .addComponent(textFieldGivenNameUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel20)
+                    .addComponent(textFieldSurNameUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(textFieldUserNameUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -530,14 +535,15 @@ private MainControl control;
     private javax.swing.JPasswordField passwordFieldUpdateCheck;
     private javax.swing.JTextField textFieldEMail;
     private javax.swing.JTextField textFieldEMailUpdate;
+    private javax.swing.JTextField textFieldGivenNameUpdate;
     private javax.swing.JTextField textFieldNachname;
     private javax.swing.JTextField textFieldNachnameSearch;
-    private javax.swing.JTextField textFieldRealNameUpdate;
     private javax.swing.JTextField textFieldRoomNumber1;
     private javax.swing.JTextField textFieldRoomNumber2;
     private javax.swing.JTextField textFieldRoomNumber3;
     private javax.swing.JTextField textFieldRoomNumber4;
     private javax.swing.JTextField textFieldRoomSearch;
+    private javax.swing.JTextField textFieldSurNameUpdate;
     private javax.swing.JTextField textFieldUserNameUpdate;
     private javax.swing.JTextField textFieldUsername;
     private javax.swing.JTextField textFieldUsernameSearch;
@@ -613,8 +619,12 @@ private MainControl control;
         return textFieldUsernameSearch;
     }
 
-    public JTextField getTextFieldRealNameUpdate() {
-        return textFieldRealNameUpdate;
+    public JTextField getTextFieldSurNameUpdate() {
+        return textFieldSurNameUpdate;
+    }
+
+    public JTextField getTextFieldGivenNameUpdate() {
+        return textFieldGivenNameUpdate;
     }
 
     public JTextField getTextUserNameUpdate() {

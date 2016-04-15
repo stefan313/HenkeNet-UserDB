@@ -378,8 +378,12 @@
                               </Group>
                               <EmptySpace min="-2" pref="23" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="textFieldRealNameUpdate" max="32767" attributes="0"/>
                                   <Component id="textFieldUserNameUpdate" max="32767" attributes="0"/>
+                                  <Group type="102" attributes="0">
+                                      <Component id="textFieldGivenNameUpdate" min="-2" pref="153" max="-2" attributes="0"/>
+                                      <EmptySpace max="32767" attributes="0"/>
+                                      <Component id="textFieldSurNameUpdate" min="-2" pref="153" max="-2" attributes="0"/>
+                                  </Group>
                               </Group>
                           </Group>
                       </Group>
@@ -413,8 +417,9 @@
                       <Component id="jLabel19" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="textFieldRealNameUpdate" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="textFieldGivenNameUpdate" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel20" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="textFieldSurNameUpdate" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
@@ -529,7 +534,7 @@
                 <Property name="text" type="java.lang.String" value="Real name:"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JTextField" name="textFieldRealNameUpdate">
+            <Component class="javax.swing.JTextField" name="textFieldGivenNameUpdate">
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel21">
               <Properties>
@@ -537,6 +542,8 @@
               </Properties>
             </Component>
             <Component class="javax.swing.JTextField" name="textFieldUserNameUpdate">
+            </Component>
+            <Component class="javax.swing.JTextField" name="textFieldSurNameUpdate">
             </Component>
           </SubComponents>
         </Container>

@@ -66,7 +66,7 @@ public class MainControl {
             if (this.mainView.getTextFieldRoomNumber1().getText().length() != 2
                     || this.mainView.getTextFieldRoomNumber2().getText().length() != 2
                     || this.mainView.getTextFieldRoomNumber3().getText().length() != 2) {
-                LOG.log(Level.WARNING, "Review room number.");
+                LOG.log(Level.WARNING, "[FAIL] Review room number.");
                 return;
             }
 
@@ -82,18 +82,18 @@ public class MainControl {
                     expyDate = "2016-04-16";
             //Daten checken
             if (!password.equals(String.valueOf(this.mainView.getPasswordFieldCheck().getPassword()))) {
-                LOG.log(Level.WARNING, "Passwords do not match.");
+                LOG.log(Level.WARNING, "[FAIL] Passwords do not match.");
                 return;
             }
             if (password.equalsIgnoreCase("")
                     || username.equalsIgnoreCase("")) {
-                LOG.log(Level.WARNING, "Password is empty.");
+                LOG.log(Level.WARNING, "[FAIL] Password is empty.");
                 return;
             }
             //Daten zur DB senden
             //Insert Username and Pw
             new User(username, password, roomnumber, nachname, vorname, email, expyDate).insert(connection);
-            LOG.info("--------------------SUCCESS--------------------");
+            LOG.info("[SUCCESS] Added user '" + username + "'");
         } catch (SQLException ex) {
             LOG.log(Level.WARNING, "[FAIL] " + ex.getLocalizedMessage(), ex);
         }
@@ -108,7 +108,7 @@ public class MainControl {
                     roomnr = mainView.getTextFieldRoomSearch().getText();
             
             if(user.equals("") && name.equals("") && roomnr.equals("")){
-                LOG.log(Level.WARNING, "Please fill at least one search field.");
+                LOG.log(Level.WARNING, "[FAIL] Please fill at least one search field.");
                 return;
             }
             
@@ -158,7 +158,7 @@ public class MainControl {
                 count++;
             }
             if(count==0){
-                LOG.log(Level.WARNING, "No entry found.");
+                LOG.log(Level.WARNING, "[FAIL] No entry found.");
                 return;
             }
             
@@ -168,10 +168,11 @@ public class MainControl {
             }
             
             preparedStatement.close();
-            LOG.info("--------------------SUCCESS--------------------");
+            LOG.info("[SUCCESS] Found user '" + currentUser.username + "'");
             
             mainView.getTextFieldEMailUpdate().setText(currentUser.email);
-            mainView.getTextFieldRealNameUpdate().setText(currentUser.givenname + " " + currentUser.surname);
+            mainView.getTextFieldGivenNameUpdate().setText(currentUser.givenname);
+            mainView.getTextFieldSurNameUpdate().setText(currentUser.surname);
             mainView.getTextUserNameUpdate().setText(currentUser.username);
             mainView.getPasswordFieldUpdate().setText(currentUser.password);
             mainView.getPasswordFieldUpdateCheck().setText(currentUser.password);
@@ -186,7 +187,8 @@ public class MainControl {
         try {
             //Daten aus mainView holen
             String user = mainView.getTextUserNameUpdate().getText(),
-                    name = mainView.getTextFieldRealNameUpdate().getText(),
+                    surname = mainView.getTextFieldSurNameUpdate().getText(),
+                    givenname = mainView.getTextFieldGivenNameUpdate().getText(),
                     passwd = String.valueOf(mainView.getPasswordFieldUpdate().getPassword()),
                     passwdchk = String.valueOf(mainView.getPasswordFieldUpdateCheck().getPassword()),
                     email = mainView.getTextFieldEMailUpdate().getText();
@@ -202,12 +204,13 @@ public class MainControl {
             }
              
             currentUser.username = user;
-            currentUser.surname = name;
+            currentUser.surname = surname;
+            currentUser.givenname = givenname;
             currentUser.password = passwd;
             currentUser.email = email;
             currentUser.update(connection);
             
-            LOG.info("--------------------SUCCESS--------------------");
+            LOG.info("[SUCCESS] Updated user '" + currentUser.username + "'");
             enableEditSection(false);
             
         } catch (SQLException ex) {
@@ -234,7 +237,8 @@ public class MainControl {
         this.mainView.getButtonCommitUpdate1().setEnabled(enabled);
         
         this.mainView.getTextFieldEMailUpdate().setEnabled(enabled);
-        this.mainView.getTextFieldRealNameUpdate().setEnabled(enabled);
+        this.mainView.getTextFieldSurNameUpdate().setEnabled(enabled);
+        this.mainView.getTextFieldGivenNameUpdate().setEnabled(enabled);
         this.mainView.getPasswordFieldUpdate().setEnabled(enabled);
         this.mainView.getPasswordFieldUpdateCheck().setEnabled(enabled);
         this.mainView.getTextUserNameUpdate().setEnabled(enabled);
