@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.StreamHandler;
 import java.util.logging.LogRecord;
+import java.util.ArrayList;
 
 /**
  *
@@ -59,7 +60,6 @@ public class MainControl {
     }
         
     void commit() {
-        try {
             //Daten aus mainView holen
             if (this.mainView.getTextFieldRoomNumber1().getText().length() != 2
                     || this.mainView.getTextFieldRoomNumber2().getText().length() != 2
@@ -90,83 +90,96 @@ public class MainControl {
             }
             //Daten zur DB senden
             //Insert Username and Pw
-            new User(username, password, roomnumber, nachname, vorname, email, expyDate).insert(dataSource.getConnection());
+            dataSource.insert(
+                    new User(username, password, roomnumber, nachname, vorname, email, expyDate));
             LOG.info("[SUCCESS] Added user '" + username + "'");
-        } catch (SQLException ex) {
-            LOG.log(Level.WARNING, "[FAIL] " + ex.getLocalizedMessage(), ex);
-        }
     }
 
     
     void commitSearch() {
-        try {
             //Daten aus mainView holen
-            String user = mainView.getTextFieldUsernameSearch().getText(),
+            String user = mainView.getTextFieldUsernameSearch().getText(); /*,
                     name = mainView.getTextFieldNachnameSearch().getText(),
                     roomnr = mainView.getTextFieldRoomSearch().getText();
             
             if(user.equals("") && name.equals("") && roomnr.equals("")){
                 LOG.log(Level.WARNING, "[FAIL] Please fill at least one search field.");
                 return;
-            }
+            }*/
             
-            
-            String statement = "SELECT * FROM users WHERE ";
-            boolean first = true;
-            if(user.length()>1){
-                statement += "username='"+user+"'";
-                first = false;
-            }
-           
-            if(name.length()>0){
-                if(!first){
-                    statement += " AND ";
-                } 
-                statement += "(surname LIKE '%" + name +"%' OR givenname LIKE '%" + name + "%')";
-                first = false;
-            }
-             
-            if(roomnr.length()>0){
-                if(!first){
-                    statement += " AND ";
-                } 
-                statement += "room='" + roomnr +"'";
-            }
-            
-            //Terminate statemnt
-            statement += ";";
-            
-            //Daten zur DB senden
-            //Insert Username and Pw
-            PreparedStatement preparedStatement = dataSource.getConnection().prepareStatement(statement);
-            ResultSet set = preparedStatement.executeQuery();
-            int count = 0;
-            
-            while(set.next()){
-            	currentUser = new User(
-            			set.getString("username"),
-            			set.getString("password"),
-            			set.getString("room"),
-            			set.getString("surname"),
-            			set.getString("givenname"),
-            			set.getString("email"),
-            			set.getString("expiration_date")
-            			);
-                currentUser.setUID(Integer.parseInt(set.getString("id")));
-                count++;
-            }
-            if(count==0){
-                LOG.log(Level.WARNING, "[FAIL] No entry found.");
+            // nur mal zum testen
+            ArrayList<User> result = dataSource.lookupUser(user);
+            if (result.isEmpty()) {
+                LOG.info("No hits.");
                 return;
+                // who the fuck programmiert eine suchfunktion,
+                // haupteinstiegspunkt und einer der zentralen
+                // bestandteile unseres projekts als void()?
+                // tobi, WARUUUUUUUMMM????
             }
             
-             if(count>1){
-                LOG.log(Level.WARNING, count +" entries found. Please fill in more search parameters.");
-                return;
-            }
+            for (User u : result)
+                LOG.info("[SQL] Found user '" + u.username + "'");
             
-            preparedStatement.close();
-            LOG.info("[SUCCESS] Found user '" + currentUser.username + "'");
+            LOG.info("[SQL] Found " + result.size() + " users.");
+            currentUser = result.get(0);
+            
+//            String statement = "SELECT * FROM users WHERE ";
+//            boolean first = true;
+//            if(user.length()>1){
+//                statement += "username='"+user+"'";
+//                first = false;
+//            }
+//           
+//            if(name.length()>0){
+//                if(!first){
+//                    statement += " AND ";
+//                } 
+//                statement += "(surname LIKE '%" + name +"%' OR givenname LIKE '%" + name + "%')";
+//                first = false;
+//            }
+//             
+//            if(roomnr.length()>0){
+//                if(!first){
+//                    statement += " AND ";
+//                } 
+//                statement += "room='" + roomnr +"'";
+//            }
+//            
+//            //Terminate statemnt
+//            statement += ";";
+//            
+//            //Daten zur DB senden
+//            //Insert Username and Pw
+//            PreparedStatement preparedStatement = dataSource.getConnection().prepareStatement(statement);
+//            ResultSet set = preparedStatement.executeQuery();
+//            int count = 0;
+//            
+//            while(set.next()){
+//            	currentUser = new User(
+//            			set.getString("username"),
+//            			set.getString("password"),
+//            			set.getString("room"),
+//            			set.getString("surname"),
+//            			set.getString("givenname"),
+//            			set.getString("email"),
+//            			set.getString("expiration_date")
+//            			);
+//                currentUser.setUID(Integer.parseInt(set.getString("id")));
+//                count++;
+//            }
+//            if(count==0){
+//                LOG.log(Level.WARNING, "[FAIL] No entry found.");
+//                return;
+//            }
+//            
+//             if(count>1){
+//                LOG.log(Level.WARNING, count +" entries found. Please fill in more search parameters.");
+//                return;
+//            }
+//            
+//            preparedStatement.close();
+//            LOG.info("[SUCCESS] Found user '" + currentUser.username + "'");
             
             mainView.getTextFieldEMailUpdate().setText(currentUser.email);
             mainView.getTextFieldGivenNameUpdate().setText(currentUser.givenname);
@@ -175,14 +188,9 @@ public class MainControl {
             mainView.getPasswordFieldUpdate().setText(currentUser.password);
             mainView.getPasswordFieldUpdateCheck().setText(currentUser.password);
             enableEditSection(true);
-            
-        } catch (SQLException ex) {
-            LOG.log(Level.WARNING, "[FAIL] " + ex.getLocalizedMessage(), ex);
-        }
     }
     
     void commitUpdate() {
-        try {
             //Daten aus mainView holen
             String user = mainView.getTextUserNameUpdate().getText(),
                     surname = mainView.getTextFieldSurNameUpdate().getText(),
@@ -206,14 +214,10 @@ public class MainControl {
             currentUser.givenname = givenname;
             currentUser.password = passwd;
             currentUser.email = email;
-            currentUser.update(dataSource.getConnection());
+            dataSource.update(currentUser);
             
             LOG.info("[SUCCESS] Updated user '" + currentUser.username + "'");
             enableEditSection(false);
-            
-        } catch (SQLException ex) {
-            LOG.log(Level.WARNING, "[FAIL] " + ex.getLocalizedMessage(), ex);
-        }
     }
     
     void clearView() {

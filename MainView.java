@@ -105,6 +105,8 @@ private MainControl control;
         textFieldUserNameUpdate = new javax.swing.JTextField();
         textFieldSurNameUpdate = new javax.swing.JTextField();
         jPanel3 = new javax.swing.JPanel();
+        jLabel12 = new javax.swing.JLabel();
+        jLabel22 = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
         txtStatusBar = new javax.swing.JLabel();
 
@@ -281,7 +283,11 @@ private MainControl control;
 
         jLabel14.setText("Surname:");
 
+        textFieldNachnameSearch.setEditable(false);
+
         jLabel15.setText("Room:");
+
+        textFieldRoomSearch.setEditable(false);
 
         ButtonCommitSearch.setText("Search!");
         ButtonCommitSearch.addActionListener(new java.awt.event.ActionListener() {
@@ -417,20 +423,37 @@ private MainControl control;
 
         jTabbedPane1.addTab("Edit Account", jPanel2);
 
+        jLabel12.setText("Nope...");
+
+        jLabel22.setText("Aber hier soll ungefähr das Main-UI rein.");
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 459, Short.MAX_VALUE)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(189, 189, 189)
+                        .addComponent(jLabel12))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(61, 61, 61)
+                        .addComponent(jLabel22)))
+                .addContainerGap(111, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 373, Short.MAX_VALUE)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGap(147, 147, 147)
+                .addComponent(jLabel12)
+                .addGap(56, 56, 56)
+                .addComponent(jLabel22)
+                .addContainerGap(140, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Browse", jPanel3);
 
-        jPanel6.setBorder(javax.swing.BorderFactory.createBevelBorder(1));
+        jPanel6.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         jPanel6.setLayout(new java.awt.BorderLayout());
 
         txtStatusBar.setName("txtStatusBar"); // NOI18N
@@ -504,6 +527,7 @@ private MainControl control;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
@@ -514,6 +538,7 @@ private MainControl control;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
+    private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;

@@ -45,12 +45,32 @@ public class MySQLDataLink implements DataLink {
     }
     
     public int insert(User user) {
-        // STUB
-        return -1;
+        try { // or dont..
+            String statement = prepareInsertStatement(user);
+            System.out.println("[SQL] " + statement + "\n");
+            PreparedStatement preparedStatement = link.prepareStatement(statement);
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+            return 1; // FIX: return new uid!
+        } catch (SQLException e) {
+            System.out.println("And Fail.");
+            return -1337;
+        }
     }
     public boolean update(User user) {
-        // STUB
-        return false;
+        try { // motherfucker
+	String statement = prepareUpdateStatement(user);
+	System.out.println("[SQL] " + statement + "\n");
+        PreparedStatement preparedStatement = link.prepareStatement(statement);
+        preparedStatement.executeUpdate();
+        preparedStatement.close();	
+            return (!(user.isModified = false));
+            // heh xD
+        }catch (SQLException e) {
+            System.out.println ("And Fail.");
+            return (!(user.isModified = true));
+            // heh xD
+        }
     }
     
     public User getUser(String username) {
@@ -63,7 +83,30 @@ public class MySQLDataLink implements DataLink {
     }
     
     public ArrayList<User> lookupUser(String anyKey) {
-        return null;
+        String statement = "SELECT * FROM users WHERE username LIKE '%"
+                + anyKey + "%' LIMIT 100;";
+        try {
+        PreparedStatement search = link.prepareStatement(statement);
+        ResultSet result = search.executeQuery();
+        
+        ArrayList<User> foundUsers = new ArrayList<>();
+        while (result.next())
+            foundUsers.add(
+                    new User(
+                            result.getString("username"),
+                            result.getString("password"),
+                            result.getString("surname"),
+                            result.getString("givenname"),
+                            result.getString("room"),
+                            result.getString("email"),
+                            result.getString("expiration_date")
+                    ).setUID(Integer.parseInt(result.getString("id")))
+            );
+        return foundUsers;
+        } catch (SQLException e) {
+            System.out.println("[SQL][FAIL]" + e.getMessage());
+            return null;
+        }
     }
     
     // AUA GANZ BOESE KACKE
@@ -78,4 +121,41 @@ public class MySQLDataLink implements DataLink {
             Logger.getLogger(MySQLDataLink.class.getName()).log(Level.SEVERE, "[SQL][FAIL] Failed to terminate connection.", e);
         }
     }
+    	
+	
+	
+	private String prepareInsertStatement(User u) {
+        String statement = "INSERT INTO users SET ";
+        
+        statement += "username='"+u.username+"',";
+        statement += "password='"+u.password+"',";
+        statement += "room='"+u.room+"',";
+        statement += "surname='"+u.surname+"',";
+        statement += "givenname='"+u.givenname+"',";
+        statement += "email='"+u.email+"',";
+        statement += "expiration_date='"+u.expirationDate+"';";
+        
+        return statement;
+	}
+	
+	private String prepareUpdateStatement(User u) {
+        String statement = "UPDATE users SET ";
+        
+        statement += "username='"+u.username+"',";
+        statement += "password='"+u.password+"',";
+        statement += "room='"+u.room+"',";
+        statement += "surname='"+u.surname+"',";
+        statement += "givenname='"+u.givenname+"',";
+        statement += "email='"+u.email+"',";
+        
+        statement += "expiration_date=" +
+        		(u.expirationDate == null
+        				? "NULL"
+        				: "'" + u.expirationDate + "'"
+        				);
+        
+        statement += " WHERE id="+u.user_id+";";
+		
+        return statement;
+	}
 }
