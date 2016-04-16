@@ -8,20 +8,23 @@ import java.sql.Connection;
  * @author Tobias
  */
 public class Transaction {
-    private String user;
+    private String dbuser;
     private int amountPayed;
     private String description;
     private String date;
+    private User account;
 
     /**
      * Create a new Trancaction.
-     * @param user The database user responsible for the Transaction
+     * @param dbuser The database user responsible for the transaction.
+     * @param account The account affected by this transaction.
      * @param amountPayed Amount in EuroCENT payed.
      * @param description Verbal description.
      * @param date The date when this transaction was executed.
      */
-    public Transaction(String user, int amountPayed, String description, String date) {
-        this.user = user;
+    public Transaction(String dbuser, User account, int amountPayed, String description, String date) {
+        this.dbuser = dbuser;
+        this.account = account;
         this.amountPayed = amountPayed;
         this.description = description;
         this.date = date;
@@ -29,8 +32,12 @@ public class Transaction {
     
     //Getters
 
-    public String getUser() {
-        return user;
+    public String getDbUser() {
+        return dbuser;
+    }
+    
+    public User getAccount() {
+        return account;
     }
 
     public int getAmountPayed() {
