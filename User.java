@@ -70,6 +70,8 @@ public class User {
         
         LinkedList<User> ret = new LinkedList<User>();
 
+        // Diese Funktion gibts unter
+        // ArrayList<User> MySQLDataLink.lookupUser(String)
         //TODO
         return ret;
     }

@@ -54,20 +54,36 @@ public class MySQLDataLink implements DataLink {
             return -1337;
         }
     }
-    public boolean update(User user) {
+    public int insert(User user, String comment, int amountReceivedInCents) {
+        // TODO
+        return -1;
+    }
+    public int insert(User user, String comment) {
+        return insert(user, comment, 0);
+    }
+    public int update(User user) {
         try { // motherfucker
 	String statement = prepareUpdateStatement(user);
 	System.out.println("[SQL] " + statement + "\n");
         PreparedStatement preparedStatement = link.prepareStatement(statement);
         preparedStatement.executeUpdate();
         preparedStatement.close();	
-            return (!(user.isModified = false));
+            return user.getUID();
             // heh xD
         }catch (SQLException e) {
             System.out.println ("And Fail.");
             return (!(user.isModified = true));
             // heh xD
         }
+    }
+    
+    public int update(User user, String comment) {
+        return update(user, comment, 0);
+    }
+    
+    public int update(User user, String comment, int amountReceivedInCents) {
+        // TODO
+        return -1;
     }
     
     public User getUser(String username) {
@@ -79,6 +95,7 @@ public class MySQLDataLink implements DataLink {
         return null;
     }
     
+    @Override
     public ArrayList<User> lookupUser(String anyKey) {
         String statement = "SELECT * FROM users WHERE username LIKE '%"
                 + anyKey + "%' LIMIT 100;";

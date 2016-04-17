@@ -16,7 +16,14 @@ public interface DataLink {
     public void disconnect();
     
     public int insert(User user);
-    public boolean update(User user);
+    public int insert(User user, String comment);
+    public int insert(User user, String comment, int amountReceivedInCents);
+    public int update(User user);
+    public int update(User user, String comment);
+    public int update(User user, String comment, int amountReceivedInCents);
+    public int delete(User user);
+    public int delete(User user, String comment);
+    public int delete(User user, String comment, int amountReceivedInCents);
     
     public User getUser(String username);
     public User getUser(int uid);
