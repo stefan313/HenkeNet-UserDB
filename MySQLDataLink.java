@@ -1,6 +1,3 @@
-
-// import java.util.ArrayList;
-
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -95,9 +92,9 @@ public class MySQLDataLink implements DataLink {
                     new User(
                             result.getString("username"),
                             result.getString("password"),
+                            result.getString("room"),
                             result.getString("surname"),
                             result.getString("givenname"),
-                            result.getString("room"),
                             result.getString("email"),
                             result.getString("expiration_date")
                     ).setUID(Integer.parseInt(result.getString("id")))
