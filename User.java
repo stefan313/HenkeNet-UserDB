@@ -44,7 +44,7 @@ public class User {
         user_id = userID;
         isModified = false;
     }
-        
+     
 	public User(String username) {
 		// TODO: add getter function
 	}

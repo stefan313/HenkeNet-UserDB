@@ -271,7 +271,7 @@ public class EditCreateForm extends javax.swing.JFrame {
         if(u !=null){
             this.setVisible(false);
             if(userID != null){
-                u.setUID(userID);
+                u.user_id =userID;
                 control.initUpdate(u);
             }else{
                 control.initCreate(u);
