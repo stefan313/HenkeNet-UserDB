@@ -40,8 +40,16 @@ public class User {
         // "User" instances with a given id refer to ones already existing
         // in the DB, hence the usual constructor is called and afterwards
         // isModified is set to false.
-        new User(username, password, room, surname, givenName, email, expirationDate);
-        user_id = userID;
+        
+        //ARGGHH, NICK!
+        this.username = username;
+        this.password = password;
+        this.surname = surname;
+        this.givenname = givenName;
+        this.room = room;
+        this.email = email;
+        this.expirationDate = expirationDate;
+        this.user_id = userID;
         isModified = false;
     }
      
