@@ -15,7 +15,7 @@ public class Transaction {
     private User account;
 
     /**
-     * Create a new Trancaction.
+     * Create a new Transaction.
      * @param dbuser The database user responsible for the transaction.
      * @param account The account affected by this transaction.
      * @param amountPayed Amount in EuroCENT payed.
@@ -57,7 +57,7 @@ public class Transaction {
      * @param connection The database link to use.
      * @return True, if the connection was executed successfully. False if an error occured.
      */
-    public boolean commit(Connection connection){
+    public boolean commit(DataLink dataLink){
         //TODO
         return true;
     }

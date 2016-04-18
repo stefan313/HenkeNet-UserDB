@@ -5,103 +5,69 @@
  * 
  */
 
-// temporary until implementation of dataLink
-import java.sql.SQLException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  * @author nick
  *
  */
 public class User {
 
-	public String username;
-	public String password;
-	public String surname;
-	public String givenname;
-	public String room;
-	public String email;
-	public String expirationDate;
-	
-	// this is only referring to a MySQL record id! 
-	public int user_id;
-	public boolean isModified;
-	
-	public User(String u, String p, String r, String s, String g, String e, String d) {
-		username = u;
-		password = p;
-		surname = s;
-		givenname = g;
-		room = r;
-		email = e;
-		expirationDate = d;
-		
-		isModified = true;
-	}
+    public String username;
+    public String password;
+    public String surname;
+    public String givenname;
+    public String room;
+    public String email;
+    public String expirationDate;
 
-	public User(String uname) {
+    public int user_id;
+    public boolean isModified;
+
+    public User(String username, String password, String room, String surname,
+            String givenName, String email, String expirationDate) {
+        this.username = username;
+        this.password = password;
+        this.surname = surname;
+        this.givenname = givenName;
+        this.room = room;
+        this.email = email;
+        this.expirationDate = expirationDate;
+
+        isModified = true;
+    }
+
+    public User(int userID, String username, String password, String room,
+            String surname, String givenName, String email, String expirationDate) {
+        // "User" instances with a given id refer to ones already existing
+        // in the DB, hence the usual constructor is called and afterwards
+        // isModified is set to false.
+        new User(username, password, room, surname, givenName, email, expirationDate);
+        user_id = userID;
+        isModified = false;
+    }
+        
+	public User(String username) {
 		// TODO: add getter function
 	}
 	
 	public User(int uid) {
 		// TODO: add getter function
 	}
-                
-	public User setUID(int uid) {
-		user_id = uid;
-                return this;
-                // fick-boeser hack
-	}
 	
     /**
-     * Main search function. This function returns all users whose username,
-     * roomnumber (or real name?) contains the given search text.
-     * (This can also be implemented as constructor, but constructors normally
-     * just initialize objects ;) )
-     * @param connection The data base connection.
-     * @param searchText Text from the search function.
-     * @return A List containing all Users matching the specified criteria.
-     */
-    public static List<User> get(Connection connection, String searchText){
-        
-        LinkedList<User> ret = new LinkedList<User>();
-
-        // Diese Funktion gibts unter
-        // ArrayList<User> MySQLDataLink.lookupUser(String)
-        //TODO
-        return ret;
-    }
-        
-	// synchronise user object with database
-
-    /**
      *
-     * @param connection
-     * @throws SQLException
+     * @param dataLink
      */
-	public void update(Connection connection) throws SQLException {
-            String statement = prepareUpdateStatement();
-            System.out.println("[SQL] " + statement + "\n");
-            PreparedStatement preparedStatement = connection.prepareStatement(statement);
-            preparedStatement.executeUpdate();
-            preparedStatement.close();	
-        
-		isModified = false;
+	public void update(DataLink dataLink) {
+            dataLink.update(this);
+            isModified = false;
 	}
 
-        
-	public void insert(Connection connection) throws SQLException {
-            String statement = prepareInsertStatement();
-            System.out.println("[SQL] " + statement + "\n");
-            PreparedStatement preparedStatement = connection.prepareStatement(statement);
-            preparedStatement.executeUpdate();
-            preparedStatement.close();	
-        
-		isModified = false;
+    /*
+     * @param dataLink   
+     */
+	public void insert(DataLink dataLink) {
+            dataLink.insert(this);
+            isModified = false;
 	}
         
         /**
@@ -109,21 +75,21 @@ public class User {
          * @param connection The data base connection.
          * @param t Transaction for this action. Must not be null.
          */
-        public void insert(Connection connection, Transaction t){
+        public void insert(DataLink dataLink, Transaction t){
             //TODO
-            t.commit(connection);
+            t.commit(dataLink);
         }
 
         /**
          * Extend the validity of an account to the given new expiration data.
          * @param connection The data base connection.
-         * @param expyDate The new expiration date to be set.
+         * @param expirationDate The new expiration date to be set.
          * @param t Transaction for this action. Must not be null.
          */
-        public void extendValidity(Connection connection, String expyDate,
+        public void extendValidity(DataLink dataLink, String expirationDate,
                 Transaction t){
             //TODO
-            t.commit(connection);
+            t.commit(dataLink);
         }
 
         /**
@@ -132,10 +98,10 @@ public class User {
          * @param t Transaction. Can be null, if none occured. 
          *      (e.g. a user just moved out, ...)
          */
-        public void delete(Connection connection, Transaction t){
+        public void delete(DataLink dataLink, Transaction t){
             //TODO
             if(t!=null){
-                t.commit(connection);
+                t.commit(dataLink);
             }
         }
         

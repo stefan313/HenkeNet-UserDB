@@ -63,17 +63,16 @@ public class MySQLDataLink implements DataLink {
     }
     public int update(User user) {
         try { // motherfucker
-	String statement = prepareUpdateStatement(user);
-	System.out.println("[SQL] " + statement + "\n");
-        PreparedStatement preparedStatement = link.prepareStatement(statement);
-        preparedStatement.executeUpdate();
-        preparedStatement.close();	
-            return user.getUID();
-            // heh xD
-        }catch (SQLException e) {
-            System.out.println ("And Fail.");
-            return (!(user.isModified = true));
-            // heh xD
+            String statement = prepareUpdateStatement(user);
+            System.out.println("[SQL] " + statement + "\n");
+            PreparedStatement preparedStatement = link.prepareStatement(statement);
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+            // TODO fix return value
+            return 0;
+        } catch (SQLException e) {
+            System.out.println("And Fail.");
+            return -1;
         }
     }
     
@@ -107,6 +106,7 @@ public class MySQLDataLink implements DataLink {
         while (result.next())
             foundUsers.add(
                     new User(
+                            Integer.parseInt(result.getString("id")),
                             result.getString("username"),
                             result.getString("password"),
                             result.getString("room"),
@@ -114,13 +114,28 @@ public class MySQLDataLink implements DataLink {
                             result.getString("givenname"),
                             result.getString("email"),
                             result.getString("expiration_date")
-                    ).setUID(Integer.parseInt(result.getString("id")))
+                    )
             );
         return foundUsers;
         } catch (SQLException e) {
             System.out.println("[SQL][FAIL]" + e.getMessage());
             return null;
         }
+    }
+    
+    public int delete(User user) {
+        // TODO
+        return 0;
+    }
+    
+    public int delete(User user, String comment) {
+        // TODO
+        return 0;
+    }
+    
+    public int delete(User user, String comment, int amountReceivedInCents) {
+        // TODO
+        return 0;
     }
     
     // AUA GANZ BOESE KACKE
