@@ -326,7 +326,7 @@ public class EditCreateForm extends javax.swing.JFrame {
         if (this.getTextFieldRoomNumber1().getText().length() != 2
                     || this.getTextFieldRoomNumber2().getText().length() != 2
                     || this.getTextFieldRoomNumber3().getText().length() != 2
-                    || this.getTextFieldRoomNumber3().getText().length() != 1) {
+                    || this.getTextFieldRoomNumber4().getText().length() != 1) {
                 LOG.log(Level.WARNING, "[FAIL] Review room number.");
                 return null;
             }
