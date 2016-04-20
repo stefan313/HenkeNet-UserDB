@@ -248,22 +248,23 @@ public class TransactionForm extends javax.swing.JFrame {
 
     private void btnFinishActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFinishActionPerformed
         int amount;
-        if(textAreaDescription.getText()!=null){
+        if(textFieldPayment.getText().equals("")){
             amount = 0;
         }else{
             try{
-                amount = (int) (Double.parseDouble(textAreaDescription.getText())*100);
+                amount = (int) (Double.parseDouble(textFieldPayment.getText().replace(',', '.'))*100);
             }catch(NumberFormatException e){
                 LOG.severe("Check number format.");
                 return; 
             }
         }
-         
+        
         switch(type){
             case CREATE:
                 control.commitCreate(user, textAreaDescription.getText(), amount);
                 break;
             case UPDATE:
+                
                 control.commitUpdate(user, textAreaDescription.getText(), amount);
                 break;
             case DELETE:
