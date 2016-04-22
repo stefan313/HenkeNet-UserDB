@@ -168,7 +168,7 @@ public class MainControl {
         public void publish(LogRecord rec) {
             if(mainView!=null){
                 mainView.getStatusBar().setText(rec.getMessage());
-                if (rec.getLevel().intValue() >= Level.SEVERE.intValue())
+            if (rec.getLevel().intValue() >= Level.SEVERE.intValue())
                 mainView.getStatusBar().setForeground(Color.RED);
             else
                 mainView.getStatusBar().setForeground(Color.BLACK);
@@ -176,6 +176,7 @@ public class MainControl {
             
             if(loginView!=null){
                 loginView.getLblStatusBar().setText("Try again.");
+                // message unhelpful. try again.
             }
             
         }

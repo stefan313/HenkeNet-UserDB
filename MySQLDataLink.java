@@ -13,6 +13,7 @@ import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -22,6 +23,8 @@ public class MySQLDataLink implements DataLink {
     
     private MysqlDataSource db;
     private Connection link;
+    
+    private final static Logger LOG = Logger.getLogger("*");
     
     public MySQLDataLink(String server, String dbname, String user, String pw) {
         db = new MysqlDataSource();
@@ -36,42 +39,62 @@ public class MySQLDataLink implements DataLink {
             link = db.getConnection();
             return true;
         } catch (SQLException e) {
-            Logger.getLogger(MySQLDataLink.class.getName()).log(Level.SEVERE, "[SQL][FAIL] Failed to connect.", e);
+            LOG.log(Level.SEVERE, "[SQL] Failed to connect.", e);
             return false;
         }
     }
     
-    public int insert(User user) {
-        try { // or dont..
-            String statement = prepareInsertStatement(user);
-            System.out.println("[SQL] " + statement + "\n");
-            PreparedStatement preparedStatement = link.prepareStatement(statement);
-            preparedStatement.executeUpdate();
-            preparedStatement.close();
-            return 1; // FIX: return new uid!
+    public void disconnect() {
+        try {
+            link.close();
         } catch (SQLException e) {
-            System.out.println("And Fail.");
-            return -1337;
+            LOG.log(Level.SEVERE, "[SQL] Failed to terminate connection.", e);
         }
     }
-    public int insert(User user, String comment, int amountReceivedInCents) {
-        // TODO
-        return -1;
+    
+    public int insert(User user) {
+        String sql = prepareInsertStatement(user);
+        try (Statement statement = link.createStatement()) {
+            LOG.info("[SQL] << " + sql);
+            statement.executeUpdate(sql);
+            
+            // get id of inserted user
+            ResultSet result = statement.executeQuery(sql = "SELECT LAST_INSERT_ID();");
+            result.next();
+            user.user_id = result.getInt(1);
+           
+            statement.close();
+            return user.user_id;
+            
+        } catch (SQLException e) {
+            LOG.log(Level.SEVERE, "[SQL] + Failed to insert user '" + user.username
+                    + "'\n" + "[SQL] | Error message: '" + e.getLocalizedMessage()
+                    + "'\n" + "[SQL] | Statement: '" + sql + "'");
+            return -1;
+        }
     }
+    
     public int insert(User user, String comment) {
         return insert(user, comment, 0);
     }
+    
+    public int insert(User user, String comment, int amountReceivedInCents) {
+        if (!commitTransaction(new Transaction(user, amountReceivedInCents, comment)))
+            return -1;
+        return insert(user);
+    }
+    
     public int update(User user) {
-        try { // motherfucker
-            String statement = prepareUpdateStatement(user);
-            System.out.println("[SQL] " + statement + "\n");
-            PreparedStatement preparedStatement = link.prepareStatement(statement);
-            preparedStatement.executeUpdate();
-            preparedStatement.close();
-            // TODO fix return value
-            return 0;
+        String sql = prepareUpdateStatement(user);
+        try (Statement statement = link.createStatement()) {
+            LOG.info("[SQL] << " + sql);
+            statement.executeUpdate(sql);           
+            statement.close();
+            return user.user_id;
         } catch (SQLException e) {
-            System.out.println("And Fail.");
+            LOG.log(Level.SEVERE, "[SQL] + Failed to update user '" + user.username
+                    + "'\n" + "[SQL] | Error message: '" + e.getLocalizedMessage()
+                    + "'\n" + "[SQL] | Statement: '" + sql + "'");
             return -1;
         }
     }
@@ -81,8 +104,25 @@ public class MySQLDataLink implements DataLink {
     }
     
     public int update(User user, String comment, int amountReceivedInCents) {
-        // TODO
-        return -1;
+        if (!commitTransaction(new Transaction(user, amountReceivedInCents, comment)))
+            return -1;
+        return update(user);
+    }
+    
+    public boolean commitTransaction(Transaction t) {
+        String sql = prepareTransactionStatement(t);
+        LOG.info("[SQL] << " + sql);
+        try (Statement statement = link.createStatement()) {
+            statement.executeUpdate(sql);
+            statement.close();
+            return true;
+        } catch (SQLException e) {
+            LOG.log(Level.SEVERE, "[SQL] + Failed to commit transaction (" + t.getAccount()
+                    + ", " + t.getAmountPaid() + ", '" + t.getDescription()
+                    + "'\n" + "[SQL] | Error message: '" + e.getLocalizedMessage()
+                    + "'\n" + "[SQL] | Statement: '" + sql + "'");
+            return false;
+        }
     }
     
     public User getUser(String username) {
@@ -118,73 +158,86 @@ public class MySQLDataLink implements DataLink {
             );
         return foundUsers;
         } catch (SQLException e) {
-            System.out.println("[SQL][FAIL]" + e.getMessage());
+            LOG.log(Level.SEVERE, "[SQL][FAIL]" + e.getMessage(), e);
             return null;
         }
     }
     
-    public int delete(User user) {
-        // TODO
-        return 0;
-    }
-    
-    public int delete(User user, String comment) {
-        // TODO
-        return 0;
-    }
-    
-    public int delete(User user, String comment, int amountReceivedInCents) {
-        // TODO
-        return 0;
-    }
-    
-    // AUA GANZ BOESE KACKE
-    public Connection getConnection() {
-        return link;
-    }
-    
-    public void disconnect() {
-        try {
-            link.close();
+    public boolean delete(User user) {
+        String sql = prepareDeleteStatement(user);
+        try (Statement state = link.createStatement()) {
+            if (state.executeUpdate(sql)==1)
+                return true;
+            return false;
         } catch (SQLException e) {
-            Logger.getLogger(MySQLDataLink.class.getName()).log(Level.SEVERE, "[SQL][FAIL] Failed to terminate connection.", e);
+            LOG.log(Level.SEVERE, "[SQL] + Failed to delete user '" + user.username
+                    + "'\n" + "[SQL] | Error message: '" + e.getLocalizedMessage()
+                    + "'\n" + "[SQL] | Statement: '" + sql + "'");
+            return false;
         }
     }
+    
+    public boolean delete(User user, String comment) {
+        return delete(user, comment, 0);
+    }
+    
+    public boolean delete(User user, String comment, int amountReceivedInCents) {
+        if (!commitTransaction(new Transaction(user, amountReceivedInCents, comment)))
+            return false;
+        return delete(user);
+    }
     	
-	
-	
-	private String prepareInsertStatement(User u) {
+    private String prepareInsertStatement(User u) {
         String statement = "INSERT INTO users SET ";
-        
-        statement += "username='"+u.username+"',";
-        statement += "password='"+u.password+"',";
-        statement += "room='"+u.room+"',";
-        statement += "surname='"+u.surname+"',";
-        statement += "givenname='"+u.givenname+"',";
-        statement += "email='"+u.email+"',";
-        statement += "expiration_date='"+u.expirationDate+"';";
-        
+
+        statement += "username='" + u.username + "',";
+        statement += "password='" + u.password + "',";
+        statement += "room='" + u.room + "',";
+        statement += "surname='" + u.surname + "',";
+        statement += "givenname='" + u.givenname + "',";
+        statement += "email='" + u.email + "',";
+        statement += "expiration_date='" + u.expirationDate + "';";
+
         return statement;
-	}
-	
-	private String prepareUpdateStatement(User u) {
+    }
+
+    private String prepareUpdateStatement(User u) {
         String statement = "UPDATE users SET ";
-        
-        statement += "username='"+u.username+"',";
-        statement += "password='"+u.password+"',";
-        statement += "room='"+u.room+"',";
-        statement += "surname='"+u.surname+"',";
-        statement += "givenname='"+u.givenname+"',";
-        statement += "email='"+u.email+"',";
-        
-        statement += "expiration_date=" +
-        		(u.expirationDate == null
-        				? "NULL"
-        				: "'" + u.expirationDate + "'"
-        				);
-        
-        statement += " WHERE id="+u.user_id+";";
-		
+
+        statement += "username='" + u.username + "',";
+        statement += "password='" + u.password + "',";
+        statement += "room='" + u.room + "',";
+        statement += "surname='" + u.surname + "',";
+        statement += "givenname='" + u.givenname + "',";
+        statement += "email='" + u.email + "',";
+
+        statement += "expiration_date="
+                + (u.expirationDate == null
+                        ? "NULL"
+                        : "'" + u.expirationDate + "'");
+
+        statement += " WHERE id=" + u.user_id + ";";
+
         return statement;
-	}
+    }
+
+    private String prepareDeleteStatement(User user) {
+        /*
+         * now, we absolutely NEED TO ASSURE, that the given user 
+         * id is unique, so as not to losemore data than intended.
+         * since `users`.`id` is PK/UNIQ/AI, a WHERE `id` = '%id'
+         * should suffice.
+         */
+        
+        return "DELETE FROM `users` WHERE `id` = '" + user.user_id + "'";
+    }
+    
+    private String prepareTransactionStatement(Transaction t) {
+        String statement = "INSERT INTO `transactions` ";
+        statement += "(`operator`, `user`, `amount_paid`, `comment`) VALUES ";
+        statement += "(CURRENT_USER(), '" + t.getAccount().username + "', '"
+                + t.getAmountPaid() + "', '" + t.getDescription() + "');";
+        return statement;
+    }
+       
 }

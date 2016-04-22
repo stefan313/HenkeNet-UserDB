@@ -1,5 +1,5 @@
 
-import java.sql.Connection;
+import java.util.logging.*;
 
 
 
@@ -8,31 +8,43 @@ import java.sql.Connection;
  * @author Tobias
  */
 public class Transaction {
-    private String dbuser;
-    private int amountPayed;
-    private String description;
-    private String date;
-    private User account;
+    private final String dbuser;
+    private final int amountPaid;
+    private final String description;
+    private final String date;
+    private final User account;
+    
+    private final static Logger LOG = Logger.getLogger("*"); 
 
     /**
-     * Create a new Transaction.
+     * Create new Transaction.
      * @param dbuser The database user responsible for the transaction.
      * @param account The account affected by this transaction.
-     * @param amountPayed Amount in EuroCENT payed.
+     * @param amountPaid Amount in EuroCENT payed.
      * @param description Verbal description.
      * @param date The date when this transaction was executed.
      */
-    public Transaction(String dbuser, User account, int amountPayed, String description, String date) {
+    public Transaction(String dbuser, User account, int amountPaid, String description, String date) {
+        LOG.log(Level.WARNING, "[DataIntegrity] + Creating transaction with explicitly set operator and date." +
+                "\n[DataIntegrity] | Use constructor Transaction(account, amountPaid, description) instead.");
+        
         this.dbuser = dbuser;
         this.account = account;
-        this.amountPayed = amountPayed;
+        this.amountPaid = amountPaid;
         this.description = description;
         this.date = date;
     }
     
-    //Getters
+    public Transaction(User account, int amountPaid, String description) {
+        this.account = account;
+        this.amountPaid = amountPaid;
+        this.description = description;
+        this.dbuser = null;
+        this.date = null;
+    }
 
     public String getDbUser() {
+        if (this.date == null) return "";
         return dbuser;
     }
     
@@ -40,8 +52,8 @@ public class Transaction {
         return account;
     }
 
-    public int getAmountPayed() {
-        return amountPayed;
+    public int getAmountPaid() {
+        return amountPaid;
     }
 
     public String getDescription() {
@@ -49,17 +61,21 @@ public class Transaction {
     }
 
     public String getDate() {
+        if (this.date == null) return "";
         return date;
     }
     
     /**
      * Commit the Transaction using the specified connection.
-     * @param connection The database link to use.
-     * @return True, if the connection was executed successfully. False if an error occured.
+     * @param dataLink The database link to use.
+     * @return True, if the connection was executed successfully. False if an error occurred.
+     * 
+     * commit() only calls the corresponding method in dataLink, which may
+     * or may not ignore fields such as 'dbuser' or 'date'.
+     * (MySQLDataLink always ignores 'dbuser' and 'timestamp')
      */
     public boolean commit(DataLink dataLink){
-        //TODO
-        return true;
+        return dataLink.commitTransaction(this);
     }
     
 }
