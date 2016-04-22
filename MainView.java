@@ -74,6 +74,7 @@ public class MainView extends javax.swing.JFrame {
         btnEdit = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
         btnDelete = new javax.swing.JButton();
+        btnShowTransactions = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("HenkeNet account manager");
@@ -177,6 +178,15 @@ public class MainView extends javax.swing.JFrame {
             }
         });
 
+        btnShowTransactions.setText("Show history");
+        btnShowTransactions.setToolTipText("");
+        btnShowTransactions.setEnabled(false);
+        btnShowTransactions.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnShowTransactionsActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -197,7 +207,8 @@ public class MainView extends javax.swing.JFrame {
                             .addComponent(btnEdit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnExtend, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnCreate, javax.swing.GroupLayout.DEFAULT_SIZE, 129, Short.MAX_VALUE)
-                            .addComponent(btnDelete, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(btnDelete, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnShowTransactions, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -221,6 +232,8 @@ public class MainView extends javax.swing.JFrame {
                         .addComponent(btnEdit)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnExtend)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnShowTransactions)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnDelete)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -245,7 +258,14 @@ public class MainView extends javax.swing.JFrame {
     }//GEN-LAST:event_formWindowClosing
 
     private void tblUserListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblUserListMouseClicked
-
+        if (evt.getClickCount() == 2) {
+            // do what a double click does
+            // -> open the edit window                                     
+            User currusr = getSelectedUser();
+            if (currusr != null) {
+                control.showECForm(currusr);
+            }
+        }
     }//GEN-LAST:event_tblUserListMouseClicked
 
     private void btnCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateActionPerformed
@@ -312,6 +332,10 @@ public class MainView extends javax.swing.JFrame {
         updateBrowserView();
     }//GEN-LAST:event_txtSearchTextKeyReleased
 
+    private void btnShowTransactionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnShowTransactionsActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnShowTransactionsActionPerformed
+
     private void addRow(User u, DefaultTableModel model){
         model.addRow(new Object[]{u.username, u.room, u.surname, u.givenname, u.expirationDate});
     }
@@ -321,6 +345,7 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JButton btnEdit;
     private javax.swing.JButton btnExtend;
     private javax.swing.JButton btnSearch;
+    private javax.swing.JButton btnShowTransactions;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblStatusBar;

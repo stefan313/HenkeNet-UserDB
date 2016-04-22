@@ -80,9 +80,10 @@ public class MySQLDataLink implements DataLink {
     }
     
     public int insert(User user, String comment, int amountReceivedInCents) {
+        user.user_id = insert(user);
         if (!commitTransaction(new Transaction(user, amountReceivedInCents, comment)))
             return -1;
-        return insert(user);
+        return user.user_id;
     }
     
     public int update(User user) {
@@ -111,6 +112,7 @@ public class MySQLDataLink implements DataLink {
     }
     
     public boolean commitTransaction(Transaction t) {
+        if (t.getAccount().user_id == 0) return false;
         String sql = prepareTransactionStatement(t);
         LOG.info("[SQL] << " + sql);
         try (Statement statement = link.createStatement()) {
@@ -118,7 +120,7 @@ public class MySQLDataLink implements DataLink {
             statement.close();
             return true;
         } catch (SQLException e) {
-            LOG.log(Level.SEVERE, "[SQL] + Failed to commit transaction (" + t.getAccount()
+            LOG.log(Level.SEVERE, "[SQL] + Failed to commit transaction (" + t.getAccount().username
                     + ", " + t.getAmountPaid() + ", '" + t.getDescription()
                     + "'\n" + "[SQL] | Error message: '" + e.getLocalizedMessage()
                     + "'\n" + "[SQL] | Statement: '" + sql + "'");
@@ -190,13 +192,16 @@ public class MySQLDataLink implements DataLink {
 
     private boolean initBrowser() throws SQLException {
         this.userBrowser = link.prepareStatement("SELECT * FROM `users` WHERE"
-                + "`username` LIKE ? OR `room` LIKE ? ORDER BY `username` ASC;");
+                + "`username` LIKE ? OR `room` LIKE ? OR `surname` LIKE ? "
+                + "OR `givenname` LIKE ? ORDER BY `username` ASC;");
         return true;
     }
     
     private ResultSet queryBrowser(String anyKey) throws SQLException {
         userBrowser.setString(1, "%" + anyKey + "%");
         userBrowser.setString(2, "%" + anyKey + "%");
+        userBrowser.setString(3, "%" + anyKey + "%");
+        userBrowser.setString(4, "%" + anyKey + "%");
         return userBrowser.executeQuery();
     }
     
@@ -247,9 +252,10 @@ public class MySQLDataLink implements DataLink {
     
     private String prepareTransactionStatement(Transaction t) {
         String statement = "INSERT INTO `transactions` ";
-        statement += "(`operator`, `user`, `amount_paid`, `comment`) VALUES ";
-        statement += "(CURRENT_USER(), '" + t.getAccount().username + "', '"
-                + t.getAmountPaid() + "', '" + t.getDescription() + "');";
+        statement += "(`operator`, `user`, `username`, `amount_paid`, `comment`) VALUES ";
+        statement += "(CURRENT_USER(), '" + t.getAccount().user_id + "', '"
+                + t.getAccount().username + "', '" + t.getAmountPaid() + "', '"
+                + t.getDescription() + "');";
         return statement;
     }
        

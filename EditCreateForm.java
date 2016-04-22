@@ -1,6 +1,4 @@
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
@@ -52,7 +50,7 @@ public class EditCreateForm extends javax.swing.JFrame {
             textFieldUsername.setText(showing.username);
             textFieldEMail.setText(showing.email);
             txtExpDate.setText(showing.expirationDate);
-            
+            jLabelUserID.setText("" + showing.user_id);
             userID = showing.user_id;
         } else {
             txtExpDate.setText(control.getNextExpDate());
@@ -67,6 +65,7 @@ public class EditCreateForm extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jLabel13 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
         textFieldRoomNumber1 = new javax.swing.JTextField();
         textFieldRoomNumber2 = new javax.swing.JTextField();
@@ -93,6 +92,11 @@ public class EditCreateForm extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
+        jLabel14 = new javax.swing.JLabel();
+        jLabelUserID = new javax.swing.JLabel();
+
+        jLabel13.setText("Room:");
+        jLabel13.setToolTipText("");
 
         setTitle("Create / Edit account data");
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -153,6 +157,12 @@ public class EditCreateForm extends javax.swing.JFrame {
 
         jLabel3.setText("-");
 
+        jLabel14.setText("ID:");
+        jLabel14.setToolTipText("");
+
+        jLabelUserID.setText("     ");
+        jLabelUserID.setToolTipText("");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -190,7 +200,10 @@ public class EditCreateForm extends javax.swing.JFrame {
                                 .addComponent(jLabel3)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(textFieldRoomNumber4, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel14)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabelUserID, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(textFieldVorname, javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(textFieldNachname, javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(textFieldUsername, javax.swing.GroupLayout.Alignment.LEADING)
@@ -220,7 +233,9 @@ public class EditCreateForm extends javax.swing.JFrame {
                     .addComponent(textFieldRoomNumber4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1)
                     .addComponent(jLabel2)
-                    .addComponent(jLabel3))
+                    .addComponent(jLabel3)
+                    .addComponent(jLabel14)
+                    .addComponent(jLabelUserID))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(textFieldVorname, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -300,6 +315,8 @@ public class EditCreateForm extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -308,6 +325,7 @@ public class EditCreateForm extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JLabel jLabelUserID;
     private javax.swing.JPasswordField passwordField;
     private javax.swing.JPasswordField passwordFieldCheck;
     private javax.swing.JTextField textFieldEMail;
@@ -352,10 +370,12 @@ public class EditCreateForm extends javax.swing.JFrame {
                 return null;
             }
             
-            if (expyDate.equalsIgnoreCase("")){
-                LOG.log(Level.WARNING, "[FAIL] Expirationdate is empty.");
-                return null;
-            }
+            /* if (expyDate.equalsIgnoreCase("")){
+             *    LOG.log(Level.WARNING, "[FAIL] Expiration date is empty.");
+             *    return null;
+             *}
+             * // we may want to set an empty expiration date.
+             */
             User ret = new User(username, password, roomnumber, nachname, vorname, email, expyDate);
             return ret;
     }
