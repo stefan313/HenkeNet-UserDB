@@ -137,6 +137,9 @@ public class MainView extends javax.swing.JFrame {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 txtSearchTextKeyPressed(evt);
             }
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtSearchTextKeyReleased(evt);
+            }
         });
 
         btnSearch.setText("Search");
@@ -250,6 +253,10 @@ public class MainView extends javax.swing.JFrame {
     }//GEN-LAST:event_btnCreateActionPerformed
 
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
+        updateBrowserView();
+    }
+    
+    private void updateBrowserView() {
         showing = control.doSearch(txtSearchText.getText());
         //delete from tbl
         DefaultTableModel model = (DefaultTableModel)tblUserList.getModel(); 
@@ -268,7 +275,6 @@ public class MainView extends javax.swing.JFrame {
         if(currusr!=null){
             control.showECForm(currusr);
         }
-        
     }//GEN-LAST:event_btnEditActionPerformed
 
     private void txtSearchTextKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchTextKeyPressed
@@ -301,6 +307,10 @@ public class MainView extends javax.swing.JFrame {
             defaulttext= false;
         }
     }//GEN-LAST:event_txtSearchTextMouseClicked
+
+    private void txtSearchTextKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSearchTextKeyReleased
+        updateBrowserView();
+    }//GEN-LAST:event_txtSearchTextKeyReleased
 
     private void addRow(User u, DefaultTableModel model){
         model.addRow(new Object[]{u.username, u.room, u.surname, u.givenname, u.expirationDate});

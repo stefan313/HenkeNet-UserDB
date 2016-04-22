@@ -23,6 +23,7 @@ public class MySQLDataLink implements DataLink {
     
     private MysqlDataSource db;
     private Connection link;
+    private PreparedStatement userBrowser;
     
     private final static Logger LOG = Logger.getLogger("*");
     
@@ -136,27 +137,27 @@ public class MySQLDataLink implements DataLink {
     
     @Override
     public ArrayList<User> lookupUser(String anyKey) {
-        String statement = "SELECT * FROM users WHERE username LIKE '%"
-                + anyKey + "%' LIMIT 100;";
         try {
-        PreparedStatement search = link.prepareStatement(statement);
-        ResultSet result = search.executeQuery();
-        
-        ArrayList<User> foundUsers = new ArrayList<>();
-        while (result.next())
-            foundUsers.add(
-                    new User(
-                            Integer.parseInt(result.getString("id")),
-                            result.getString("username"),
-                            result.getString("password"),
-                            result.getString("room"),
-                            result.getString("surname"),
-                            result.getString("givenname"),
-                            result.getString("email"),
-                            result.getString("expiration_date")
-                    )
-            );
-        return foundUsers;
+            if (userBrowser == null) {
+                initBrowser();
+            }
+            ResultSet result = queryBrowser(anyKey);
+            ArrayList<User> foundUsers = new ArrayList<>();
+            while (result.next()) {
+                foundUsers.add(
+                        new User(
+                                Integer.parseInt(result.getString("id")),
+                                result.getString("username"),
+                                result.getString("password"),
+                                result.getString("room"),
+                                result.getString("surname"),
+                                result.getString("givenname"),
+                                result.getString("email"),
+                                result.getString("expiration_date")
+                        )
+                );
+            }
+            return foundUsers;
         } catch (SQLException e) {
             LOG.log(Level.SEVERE, "[SQL][FAIL]" + e.getMessage(), e);
             return null;
@@ -186,7 +187,19 @@ public class MySQLDataLink implements DataLink {
             return false;
         return delete(user);
     }
-    	
+
+    private boolean initBrowser() throws SQLException {
+        this.userBrowser = link.prepareStatement("SELECT * FROM `users` WHERE"
+                + "`username` LIKE ? OR `room` LIKE ? ORDER BY `username` ASC;");
+        return true;
+    }
+    
+    private ResultSet queryBrowser(String anyKey) throws SQLException {
+        userBrowser.setString(1, "%" + anyKey + "%");
+        userBrowser.setString(2, "%" + anyKey + "%");
+        return userBrowser.executeQuery();
+    }
+    
     private String prepareInsertStatement(User u) {
         String statement = "INSERT INTO users SET ";
 
