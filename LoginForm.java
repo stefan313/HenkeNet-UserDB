@@ -85,6 +85,9 @@ public class LoginForm extends javax.swing.JFrame {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 txtUserKeyPressed(evt);
             }
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtUserKeyReleased(evt);
+            }
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 txtUserKeyTyped(evt);
             }
@@ -106,6 +109,11 @@ public class LoginForm extends javax.swing.JFrame {
         btnOK.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnOKActionPerformed(evt);
+            }
+        });
+        btnOK.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                btnOKKeyReleased(evt);
             }
         });
 
@@ -197,6 +205,14 @@ public class LoginForm extends javax.swing.JFrame {
             defaultText=false;
         }
     }//GEN-LAST:event_txtUserMouseClicked
+
+    private void txtUserKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtUserKeyReleased
+        if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) parentControl.trylogin();
+    }//GEN-LAST:event_txtUserKeyReleased
+
+    private void btnOKKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_btnOKKeyReleased
+        if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) parentControl.trylogin();
+    }//GEN-LAST:event_btnOKKeyReleased
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -166,6 +166,13 @@ public class MySQLDataLink implements DataLink {
         }
     }
     
+    public ArrayList<Transaction> lookupTransactions(User user) {
+        // testing stub
+        ArrayList<Transaction> list = new ArrayList<>();
+        list.add(new Transaction("nick", user, 1000, "account angelegt", "gestern"));
+        return list;
+    }
+    
     public boolean delete(User user) {
         String sql = prepareDeleteStatement(user);
         try (Statement state = link.createStatement()) {

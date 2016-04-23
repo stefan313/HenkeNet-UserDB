@@ -134,6 +134,10 @@ public class MainControl {
         enableMain();
     }
     
+    void showTransactionHistory(User u) {
+        new TransactionHistoryView(dataSource, u).setVisible(true);
+    }
+    
     public void closeConn(){
         dataSource.disconnect();
     }

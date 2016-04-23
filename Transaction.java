@@ -24,10 +24,7 @@ public class Transaction {
      * @param description Verbal description.
      * @param date The date when this transaction was executed.
      */
-    public Transaction(String dbuser, User account, int amountPaid, String description, String date) {
-        LOG.log(Level.WARNING, "[DataIntegrity] + Creating transaction with explicitly set operator and date." +
-                "\n[DataIntegrity] | Use constructor Transaction(account, amountPaid, description) instead.");
-        
+    public Transaction(String dbuser, User account, int amountPaid, String description, String date) {        
         this.dbuser = dbuser;
         this.account = account;
         this.amountPaid = amountPaid;

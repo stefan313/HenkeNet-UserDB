@@ -33,4 +33,5 @@ public interface DataLink {
     public User getUser(int uid);
     
     public ArrayList<User> lookupUser(String anyKey);
+    public ArrayList<Transaction> lookupTransactions(User user);
 }
