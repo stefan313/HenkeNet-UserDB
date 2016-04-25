@@ -76,6 +76,7 @@ public class MainControl {
     List<User> doSearch(String searchText){
         return dataSource.lookupUser(searchText);
     }
+    
     void initCreate(User u) {
             //Transaktionsfenster öffnen
             mainView.setEnabled(false);
@@ -146,6 +147,7 @@ public class MainControl {
         this.mainView.setEnabled(true);
         mainView.setVisible(true);
         mainView.setState(Frame.NORMAL);
+        mainView.updateBrowserView();
     }
     
 

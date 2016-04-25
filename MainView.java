@@ -270,7 +270,7 @@ public class MainView extends javax.swing.JFrame {
         updateBrowserView();
     }
     
-    private void updateBrowserView() {
+    public void updateBrowserView() {
         showing = control.doSearch(txtSearchText.getText());
         //delete from tbl
         DefaultTableModel model = (DefaultTableModel)tblUserList.getModel(); 

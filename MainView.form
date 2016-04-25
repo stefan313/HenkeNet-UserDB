@@ -44,7 +44,7 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="btnEdit" alignment="0" max="32767" attributes="0"/>
                           <Component id="btnExtend" max="32767" attributes="0"/>
-                          <Component id="btnCreate" alignment="0" pref="130" max="32767" attributes="0"/>
+                          <Component id="btnCreate" alignment="0" pref="0" max="32767" attributes="0"/>
                           <Component id="btnDelete" alignment="0" max="32767" attributes="0"/>
                           <Component id="btnShowTransactions" max="32767" attributes="0"/>
                           <Group type="102" alignment="1" attributes="0">
