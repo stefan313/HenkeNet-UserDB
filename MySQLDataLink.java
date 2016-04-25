@@ -237,7 +237,7 @@ public class MySQLDataLink implements DataLink {
         statement += "email='" + u.email + "',";
 
         statement += "expiration_date="
-                + (u.expirationDate == null
+                + (u.expirationDate.isEmpty()
                         ? "NULL"
                         : "'" + u.expirationDate + "'");
 
