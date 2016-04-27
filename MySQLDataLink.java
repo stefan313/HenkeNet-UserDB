@@ -166,11 +166,26 @@ public class MySQLDataLink implements DataLink {
         }
     }
     
+    @Override
     public ArrayList<Transaction> lookupTransactions(User user) {
-        // testing stub
-        ArrayList<Transaction> list = new ArrayList<>();
-        list.add(new Transaction("nick", user, 1000, "account angelegt", "gestern"));
-        return list;
+            try {
+            Statement st = link.createStatement();
+            ResultSet result = st.executeQuery(prepareLookupTransactionStatement(user));
+            ArrayList<Transaction> foundTransactions = new ArrayList<>();
+            while (result.next()) {
+                foundTransactions.add(
+                        new Transaction(
+                                result.getString("operator").replaceAll("@%", ""),
+                                user, 
+                                result.getInt("amount_paid"),
+                                result.getString("comment"),
+                                result.getString("timestamp")));
+            }
+            return foundTransactions;
+        } catch (SQLException e) {
+            LOG.log(Level.SEVERE, "[SQL][FAIL]" + e.getMessage(), e);
+            return null;
+        }
     }
     
     public boolean delete(User user) {
@@ -263,6 +278,11 @@ public class MySQLDataLink implements DataLink {
         statement += "(CURRENT_USER(), '" + t.getAccount().user_id + "', '"
                 + t.getAccount().username + "', '" + t.getAmountPaid() + "', '"
                 + t.getDescription() + "');";
+        return statement;
+    }
+    
+    private String prepareLookupTransactionStatement(User user) {
+        String statement = "SELECT * FROM `transactions` WHERE user="+user.user_id+" ORDER BY `timestamp` DESC;";
         return statement;
     }
        

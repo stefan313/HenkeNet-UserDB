@@ -163,11 +163,10 @@ public class MainControl {
         if (month >= 3 && month <= 9) {
             ret = c.get(Calendar.YEAR) + "-10-31";
         } else if (month < 3) {
-            ret = c.get(Calendar.YEAR) + "-04-31";
+            ret = c.get(Calendar.YEAR) + "-04-30";
         } else {
-            ret = (c.get(Calendar.YEAR) + 1) + "-04-31";
+            ret = (c.get(Calendar.YEAR) + 1) + "-04-30";
         }
-
         return ret;
     }
 
@@ -190,5 +189,4 @@ public class MainControl {
 
         }
     }
-
 }

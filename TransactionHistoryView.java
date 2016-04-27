@@ -1,3 +1,4 @@
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.logging.*;
 import javax.swing.table.DefaultTableModel;
@@ -41,8 +42,6 @@ public class TransactionHistoryView extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTableTransactionHistory = new javax.swing.JTable();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
         jTableTransactionHistory.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -54,20 +53,33 @@ public class TransactionHistoryView extends javax.swing.JFrame {
             Class[] types = new Class [] {
                 java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
 
             public Class getColumnClass(int columnIndex) {
                 return types [columnIndex];
             }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
         });
         jScrollPane1.setViewportView(jTableTransactionHistory);
+        if (jTableTransactionHistory.getColumnModel().getColumnCount() > 0) {
+            jTableTransactionHistory.getColumnModel().getColumn(0).setResizable(false);
+            jTableTransactionHistory.getColumnModel().getColumn(0).setPreferredWidth(150);
+            jTableTransactionHistory.getColumnModel().getColumn(1).setPreferredWidth(100);
+            jTableTransactionHistory.getColumnModel().getColumn(2).setPreferredWidth(100);
+            jTableTransactionHistory.getColumnModel().getColumn(3).setResizable(false);
+            jTableTransactionHistory.getColumnModel().getColumn(3).setPreferredWidth(450);
+        }
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 598, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 801, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -79,35 +91,6 @@ public class TransactionHistoryView extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(TransactionHistoryView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(TransactionHistoryView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(TransactionHistoryView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(TransactionHistoryView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-    }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTableTransactionHistory;
@@ -116,8 +99,10 @@ public class TransactionHistoryView extends javax.swing.JFrame {
     private void initTransactionTable(List<Transaction> list) {
         DefaultTableModel model = (DefaultTableModel)jTableTransactionHistory.getModel();
         for (int i = 0; i < model.getRowCount(); i++) model.removeRow(i);
+        DecimalFormat df = new DecimalFormat("0.00"); 
         for (Transaction t : list) {
-            model.addRow(new Object[]{t.getDate(), t.getDbUser(), t.getAmountPaid(), t.getDescription()});
+            String amount_paid = df.format(t.getAmountPaid()/100)+ " €";
+            model.addRow(new Object[]{t.getDate(), t.getDbUser(), amount_paid, t.getDescription()});
         }
     }
 }
