@@ -154,17 +154,17 @@ public class MainControl {
         mainView.setState(Frame.NORMAL);
         mainView.updateBrowserView();
     }
-
+    
+    //Get next expiration date for "Extend Validity"
     public String getNextExpDate() {
         Calendar c = Calendar.getInstance();
         int month = c.get(Calendar.MONTH);
         String ret;
         //Sommersemester, validate until october
-        if (month >= 3 && month <= 9) {
+        if (month >= 3 && month <= 8) {
             ret = c.get(Calendar.YEAR) + "-10-31";
-        } else if (month < 3) {
-            ret = c.get(Calendar.YEAR) + "-04-30";
         } else {
+            //Wintersemester, valdiate until april
             ret = (c.get(Calendar.YEAR) + 1) + "-04-30";
         }
         return ret;
