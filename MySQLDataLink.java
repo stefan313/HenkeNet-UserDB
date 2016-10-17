@@ -8,8 +8,8 @@
  *
  * @author nick
  */
-
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
+import com.sun.istack.internal.NotNull;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -20,13 +20,23 @@ import java.util.ArrayList;
 import java.util.logging.*;
 
 public class MySQLDataLink implements DataLink {
-    
+
     private MysqlDataSource db;
     private Connection link;
     private PreparedStatement userBrowser;
-    
+
     private final static Logger LOG = Logger.getLogger("*");
-    
+
+    /**
+     * *
+     * Beschreibt einen DataLink (ohne!! RequireSSL und UseSSL)
+     *
+     * @param server der benutzte Server
+     * @param dbname die benutze Datenbank
+     * @param user der username
+     * @param pw des usernames passwort
+     */
+    @Deprecated
     public MySQLDataLink(String server, String dbname, String user, String pw) {
         db = new MysqlDataSource();
         db.setServerName(server);
@@ -34,7 +44,38 @@ public class MySQLDataLink implements DataLink {
         db.setUser(user);
         db.setPassword(pw);
     }
-    
+
+    /**
+     * *
+     *
+     * @param server der benutzte Server
+     * @param dbname die benutze Datenbank
+     * @param user der username
+     * @param pw des usernames passwort
+     * @param keyStorePath der lokal erzeugte Keystore mit dem privaten
+     * Schlüssel des Users
+     * @param keyStorePassword das Passwort dazu
+     * @param trustStorePath der mitgelieferte trust store mit dem SSL Cert des
+     * Servers
+     * @param trustStorePassword das Passwort dazu
+     */
+    public MySQLDataLink(@NotNull String server, @NotNull String dbname, @NotNull String user,
+            @NotNull String pw, @NotNull String keyStorePath, @NotNull String keyStorePassword,
+            @NotNull String trustStorePath, @NotNull String trustStorePassword) {
+        db = new MysqlDataSource();
+        db.setServerName(server);
+        db.setDatabaseName(dbname);
+        db.setUser(user);
+        db.setPassword(pw);
+        db.setRequireSSL(true);
+        db.setUseSSL(true);
+        System.setProperty("javax.net.ssl.keyStore", keyStorePath);
+        System.setProperty("javax.net.ssl.keyStorePassword", keyStorePassword);
+        System.setProperty("javax.net.ssl.trustStore", trustStorePath);
+        System.setProperty("javax.net.ssl.trustStorePassword", trustStorePassword);
+
+    }
+
     public boolean connect() {
         try {
             link = db.getConnection();
@@ -44,7 +85,7 @@ public class MySQLDataLink implements DataLink {
             return false;
         }
     }
-    
+
     public void disconnect() {
         try {
             link.close();
@@ -52,21 +93,21 @@ public class MySQLDataLink implements DataLink {
             LOG.log(Level.SEVERE, "[SQL] Failed to terminate connection.", e);
         }
     }
-    
+
     public int insert(User user) {
         String sql = prepareInsertStatement(user);
         try (Statement statement = link.createStatement()) {
             LOG.info("[SQL] << " + sql);
             statement.executeUpdate(sql);
-            
+
             // get id of inserted user
             ResultSet result = statement.executeQuery(sql = "SELECT LAST_INSERT_ID();");
             result.next();
             user.user_id = result.getInt(1);
-           
+
             statement.close();
             return user.user_id;
-            
+
         } catch (SQLException e) {
             LOG.log(Level.SEVERE, "[SQL] + Failed to insert user '" + user.username
                     + "'\n" + "[SQL] | Error message: '" + e.getLocalizedMessage()
@@ -74,23 +115,24 @@ public class MySQLDataLink implements DataLink {
             return -1;
         }
     }
-    
+
     public int insert(User user, String comment) {
         return insert(user, comment, 0);
     }
-    
+
     public int insert(User user, String comment, int amountReceivedInCents) {
         user.user_id = insert(user);
-        if (!commitTransaction(new Transaction(user, amountReceivedInCents, comment)))
+        if (!commitTransaction(new Transaction(user, amountReceivedInCents, comment))) {
             return -1;
+        }
         return user.user_id;
     }
-    
+
     public int update(User user) {
         String sql = prepareUpdateStatement(user);
         try (Statement statement = link.createStatement()) {
             LOG.info("[SQL] << " + sql);
-            statement.executeUpdate(sql);           
+            statement.executeUpdate(sql);
             statement.close();
             return user.user_id;
         } catch (SQLException e) {
@@ -100,19 +142,22 @@ public class MySQLDataLink implements DataLink {
             return -1;
         }
     }
-    
+
     public int update(User user, String comment) {
         return update(user, comment, 0);
     }
-    
+
     public int update(User user, String comment, int amountReceivedInCents) {
-        if (!commitTransaction(new Transaction(user, amountReceivedInCents, comment)))
+        if (!commitTransaction(new Transaction(user, amountReceivedInCents, comment))) {
             return -1;
+        }
         return update(user);
     }
-    
+
     public boolean commitTransaction(Transaction t) {
-        if (t.getAccount().user_id == 0) return false;
+        if (t.getAccount().user_id == 0) {
+            return false;
+        }
         String sql = prepareTransactionStatement(t);
         LOG.info("[SQL] << " + sql);
         try (Statement statement = link.createStatement()) {
@@ -127,16 +172,17 @@ public class MySQLDataLink implements DataLink {
             return false;
         }
     }
-    
+
     public User getUser(String username) {
         // STUB
         return null;
     }
+
     public User getUser(int uid) {
         // STUB
         return null;
     }
-    
+
     @Override
     public ArrayList<User> lookupUser(String anyKey) {
         try {
@@ -165,10 +211,10 @@ public class MySQLDataLink implements DataLink {
             return null;
         }
     }
-    
+
     @Override
     public ArrayList<Transaction> lookupTransactions(User user) {
-            try {
+        try {
             Statement st = link.createStatement();
             ResultSet result = st.executeQuery(prepareLookupTransactionStatement(user));
             ArrayList<Transaction> foundTransactions = new ArrayList<>();
@@ -176,7 +222,7 @@ public class MySQLDataLink implements DataLink {
                 foundTransactions.add(
                         new Transaction(
                                 result.getString("operator").replaceAll("@%", ""),
-                                user, 
+                                user,
                                 result.getInt("amount_paid"),
                                 result.getString("comment"),
                                 result.getString("timestamp")));
@@ -187,12 +233,13 @@ public class MySQLDataLink implements DataLink {
             return null;
         }
     }
-    
+
     public boolean delete(User user) {
         String sql = prepareDeleteStatement(user);
         try (Statement state = link.createStatement()) {
-            if (state.executeUpdate(sql)==1)
+            if (state.executeUpdate(sql) == 1) {
                 return true;
+            }
             return false;
         } catch (SQLException e) {
             LOG.log(Level.SEVERE, "[SQL] + Failed to delete user '" + user.username
@@ -201,14 +248,15 @@ public class MySQLDataLink implements DataLink {
             return false;
         }
     }
-    
+
     public boolean delete(User user, String comment) {
         return delete(user, comment, 0);
     }
-    
+
     public boolean delete(User user, String comment, int amountReceivedInCents) {
-        if (!commitTransaction(new Transaction(user, amountReceivedInCents, comment)))
+        if (!commitTransaction(new Transaction(user, amountReceivedInCents, comment))) {
             return false;
+        }
         return delete(user);
     }
 
@@ -218,7 +266,7 @@ public class MySQLDataLink implements DataLink {
                 + "OR `givenname` LIKE ? ORDER BY `username` ASC;");
         return true;
     }
-    
+
     private ResultSet queryBrowser(String anyKey) throws SQLException {
         userBrowser.setString(1, "%" + anyKey + "%");
         userBrowser.setString(2, "%" + anyKey + "%");
@@ -226,7 +274,7 @@ public class MySQLDataLink implements DataLink {
         userBrowser.setString(4, "%" + anyKey + "%");
         return userBrowser.executeQuery();
     }
-    
+
     private String prepareInsertStatement(User u) {
         String statement = "INSERT INTO users SET ";
 
@@ -268,10 +316,10 @@ public class MySQLDataLink implements DataLink {
          * since `users`.`id` is PK/UNIQ/AI, a WHERE `id` = '%id'
          * should suffice.
          */
-        
+
         return "DELETE FROM `users` WHERE `id` = '" + user.user_id + "'";
     }
-    
+
     private String prepareTransactionStatement(Transaction t) {
         String statement = "INSERT INTO `transactions` ";
         statement += "(`operator`, `user`, `username`, `amount_paid`, `comment`) VALUES ";
@@ -280,10 +328,10 @@ public class MySQLDataLink implements DataLink {
                 + t.getDescription() + "');";
         return statement;
     }
-    
+
     private String prepareLookupTransactionStatement(User user) {
-        String statement = "SELECT * FROM `transactions` WHERE user="+user.user_id+" ORDER BY `timestamp` DESC;";
+        String statement = "SELECT * FROM `transactions` WHERE user=" + user.user_id + " ORDER BY `timestamp` DESC;";
         return statement;
     }
-       
+
 }

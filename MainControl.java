@@ -6,6 +6,9 @@
 
 import java.awt.Color;
 import java.awt.Frame;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,6 +24,13 @@ public class MainControl {
 
     public String dbuser;
 
+    //Strings set in initialisation
+    private String keyStorePath, keyStorePassword,
+            trustStorePath, trustStorePassword;
+
+    //Static Content
+    static private String configurationPath = "configuration.txt";
+
     //Forms
     private MainView mainView;
     private LoginForm loginView;
@@ -35,6 +45,45 @@ public class MainControl {
         // DEBUG
         LOG.setLevel(Level.INFO);
         LOG.addHandler(new StatusBar());
+
+        // Parses Required SSL Configuration, if it fails it prints it to stdout
+        // TODO: refactor into Method
+        InputStreamReader inputStreamReader = null;
+        BufferedReader configBuffer = null;
+        try {
+            inputStreamReader = new InputStreamReader(
+                    new FileInputStream(configurationPath));
+            configBuffer = new BufferedReader(inputStreamReader);
+            String line = configBuffer.readLine();
+            while (line != null) {
+                if (line.startsWith("keyStorePath=")) {
+                    keyStorePath = line.substring(line.indexOf("=") + 1);
+                } else if (line.startsWith("keyStorePassword=")) {
+                    keyStorePassword = line.substring(line.indexOf("=") + 1);
+                } else if (line.startsWith("trustStorePath=")) {
+                    trustStorePath = line.substring(line.indexOf("=") + 1);
+                } else if (line.startsWith("trustStorePassword=")) {
+                    trustStorePassword = line.substring(line.indexOf("=") + 1);
+                }
+
+                line = configBuffer.readLine();
+            }
+
+        } catch (Exception e) {
+            System.out.println("Config (SSL) parsing Failed! Exception: " + e.getMessage());
+        } finally {
+            try {
+                if (inputStreamReader != null) {
+                    inputStreamReader.close();
+                }
+                if (configBuffer != null) {
+                    configBuffer.close();
+                }
+            } catch (Exception e) {
+                System.err.println("Exception: " + e.getMessage());
+            }
+        }
+
         loginView = new LoginForm(this);
         loginView.setVisible(true);
     }
@@ -46,12 +95,24 @@ public class MainControl {
     void trylogin() {
         //zur DB verbinden
 
+        /*
         dataSource = new MySQLDataLink(
                 "shelldon",
                 "radius",
                 loginView.getTxtUser().getText(),
                 String.valueOf(loginView.getTxtPassword().getPassword())
         );
+         */
+        
+        //neuer Konstruktor initialize muss vorher ausgeführt werden! -> @NotNull im Konstruktor
+        dataSource = new MySQLDataLink("shelldon",
+                "radius",
+                loginView.getTxtUser().getText(),
+                String.valueOf(loginView.getTxtPassword().getPassword()),
+                keyStorePath,
+                keyStorePassword,
+                trustStorePath,
+                trustStorePassword);
 
         if (!(dataSource.connect())) {
             LOG.severe("Failed to connect.");
@@ -154,7 +215,7 @@ public class MainControl {
         mainView.setState(Frame.NORMAL);
         mainView.updateBrowserView();
     }
-    
+
     //Get next expiration date for "Extend Validity"
     public String getNextExpDate() {
         Calendar c = Calendar.getInstance();
