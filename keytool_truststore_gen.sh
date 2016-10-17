@@ -13,15 +13,20 @@ else
 fi
 
 echo "generating truststore for UserTool with ${1}!"
+read -p "PW for truststore:" truststorepw
 # https://dev.mysql.com/doc/connector-j/5.1/en/connector-j-reference-using-ssl.html
 keytool -v -import -alias mysqlServerCACert -file ${1} -keystore truststore
 
 echo "keytool has created truststore"
 echo "creating keystore for Usertool, geneating new key"
+read -p "PW for keystore:" keystorepw
 keytool -v -genkey -keyalg rsa -alias mysqlClientCert -keystore keystore
 
-echo "adding files to your config"
+echo "adding files to your config, CAUTION!: absolute Paths!"
 
+# Absoluter Pfad für keystores!
 $pwd = pwd
-echo "keyStorePath=${pwd}/keystore"
-echo "trustStorePath=${pwd}/truststore"
+echo "keyStorePath=${pwd}/keystore" >> configuration.txt
+echo "keyStorePassword=${keystorepw}" >> configuration.txt
+echo "trustStorePath=${pwd}/truststore" >> configuration.txt
+echo "trustStorePassword=${truststorepw}" >> configuration.txt
