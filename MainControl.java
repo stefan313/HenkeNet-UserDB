@@ -104,7 +104,9 @@ public class MainControl {
         );
          */
         
-        //neuer Konstruktor initialize muss vorher ausgeführt werden! -> @NotNull im Konstruktor
+        // TODO server name und datenbank name in die config auslagern! #gegenHardcode!
+        
+        //neuer Konstruktor initialize muss vorher ausgeführt werden!
         dataSource = new MySQLDataLink("shelldon",
                 "radius",
                 loginView.getTxtUser().getText(),

@@ -183,6 +183,7 @@ public class User {
     
     /***
      * Getter for Field
+     * passwordChanged() ist wichtig ansonsten liefert getPassword nur null aus!!!!
      * @return 
      */
     public String getPassword() {

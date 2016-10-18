@@ -306,6 +306,7 @@ public class MySQLDataLink implements DataLink {
         String statement = "INSERT INTO users SET ";
 
         statement += "username='" + u.getUsername() + "',";
+        // passwordChanged() ist wichtig ansonsten liefert getPassword nur null aus!!!!
         if(u.passwordChanged())
         {
             statement += "password='" + u.getPassword() + "',";
@@ -330,6 +331,8 @@ public class MySQLDataLink implements DataLink {
         statement += "email='" + u.email + "',";
 */
         statement += "username='" + u.getUsername() + "',";
+        
+        // passwordChanged() ist wichtig ansonsten liefert getPassword nur null aus!!!!
         if(u.passwordChanged())
         {
             statement += "password='" + u.getPassword() + "',";
