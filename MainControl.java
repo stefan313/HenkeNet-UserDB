@@ -148,9 +148,9 @@ public class MainControl {
         //Daten zur DB senden
         //Insert Username and Pw
         if (dataSource.insert(u, comment, amount) != -1) {
-            LOG.info("[SUCCESS] Added user '" + u.username + "'");
+            LOG.info("[SUCCESS] Added user '" + u.getUsername() + "'");
         } else {
-            LOG.log(Level.SEVERE, "[FAIL] Failed to insert user '" + u.username + "'");
+            LOG.log(Level.SEVERE, "[FAIL] Failed to insert user '" + u.getUsername() + "'");
         }
         enableMain();
     }
@@ -165,9 +165,9 @@ public class MainControl {
 
     void commitUpdate(User u, String comment, int amount) {
         if (dataSource.update(u, comment, amount) != -1) {
-            LOG.info("[SUCCESS] Updated user '" + u.username + "'");
+            LOG.info("[SUCCESS] Updated user '" + u.getUsername() + "'");
         } else {
-            LOG.log(Level.SEVERE, "[FAIL] Failed to update user '" + u.username + "'");
+            LOG.log(Level.SEVERE, "[FAIL] Failed to update user '" + u.getUsername() + "'");
         }
         enableMain();
     }
@@ -181,7 +181,7 @@ public class MainControl {
 
     void commitDelete(User u, String comment, int amount) {
         dataSource.delete(u, comment, amount);
-        LOG.info("[SUCCESS] Deleted user '" + u.username + "'");
+        LOG.info("[SUCCESS] Deleted user '" + u.getUsername() + "'");
         enableMain();
     }
 
@@ -194,9 +194,9 @@ public class MainControl {
 
     void commitExtend(User u, String comment, int amount) {
         if (dataSource.update(u, comment, amount) != -1) {
-            LOG.info("[SUCCESS] Extended user '" + u.username + "'");
+            LOG.info("[SUCCESS] Extended user '" + u.getUsername() + "'");
         } else {
-            LOG.log(Level.SEVERE, "[FAIL] Failed to extend user '" + u.username + "'");
+            LOG.log(Level.SEVERE, "[FAIL] Failed to extend user '" + u.getUsername() + "'");
         }
         enableMain();
     }

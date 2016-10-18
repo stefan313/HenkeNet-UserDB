@@ -9,8 +9,6 @@
  * @author nick
  */
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
-import com.sun.istack.internal.NotNull;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
@@ -21,7 +19,8 @@ import java.util.logging.*;
 
 public class MySQLDataLink implements DataLink {
 
-    private MysqlDataSource db;
+    // zusätzlicher contraint, weil lol
+    final private MysqlDataSource db;
     private Connection link;
     private PreparedStatement userBrowser;
 
@@ -60,9 +59,9 @@ public class MySQLDataLink implements DataLink {
      * Servers
      * @param trustStorePassword das Passwort dazu
      */
-    public MySQLDataLink(@NotNull String server, @NotNull String dbname, @NotNull String user,
-            @NotNull String pw, @NotNull String keyStorePath, @NotNull String keyStorePassword,
-            @NotNull String trustStorePath, @NotNull String trustStorePassword) {
+    public MySQLDataLink( String server,  String dbname,  String user,
+             String pw,  String keyStorePath,  String keyStorePassword,
+             String trustStorePath,  String trustStorePassword) {
         System.setProperty("javax.net.ssl.keyStore", keyStorePath);
         System.setProperty("javax.net.ssl.keyStorePassword", keyStorePassword);
         System.setProperty("javax.net.ssl.trustStore", trustStorePath);
@@ -88,9 +87,9 @@ public class MySQLDataLink implements DataLink {
      * Servers
      * @param trustStorePassword das Passwort dazu
      */
-    public MySQLDataLink(@NotNull String server, @NotNull String dbname, @NotNull String user,
-            @NotNull String pw,
-            @NotNull String trustStorePath, @NotNull String trustStorePassword) {
+    public MySQLDataLink( String server,  String dbname,  String user,
+             String pw,
+             String trustStorePath,  String trustStorePassword) {
         System.setProperty("javax.net.ssl.trustStore", trustStorePath);
         System.setProperty("javax.net.ssl.trustStorePassword", trustStorePassword);
         db = new MysqlDataSource();
@@ -129,13 +128,14 @@ public class MySQLDataLink implements DataLink {
             // get id of inserted user
             ResultSet result = statement.executeQuery(sql = "SELECT LAST_INSERT_ID();");
             result.next();
-            user.user_id = result.getInt(1);
+            // TODO bei so dirty hacks bitte ein bisschen kommentar funktion benutzen!!!!
+            user.setUser_id(result.getInt(1));
 
             statement.close();
-            return user.user_id;
+            return user.getUser_id();
 
         } catch (SQLException e) {
-            LOG.log(Level.SEVERE, "[SQL] + Failed to insert user '" + user.username
+            LOG.log(Level.SEVERE, "[SQL] + Failed to insert user '" + user.getUsername()
                     + "'\n" + "[SQL] | Error message: '" + e.getLocalizedMessage()
                     + "'\n" + "[SQL] | Statement: '" + sql + "'");
             return -1;
@@ -147,11 +147,11 @@ public class MySQLDataLink implements DataLink {
     }
 
     public int insert(User user, String comment, int amountReceivedInCents) {
-        user.user_id = insert(user);
+        user.setUser_id(insert(user));
         if (!commitTransaction(new Transaction(user, amountReceivedInCents, comment))) {
             return -1;
         }
-        return user.user_id;
+        return user.getUser_id();
     }
 
     public int update(User user) {
@@ -160,9 +160,9 @@ public class MySQLDataLink implements DataLink {
             LOG.info("[SQL] << " + sql);
             statement.executeUpdate(sql);
             statement.close();
-            return user.user_id;
+            return user.getUser_id();
         } catch (SQLException e) {
-            LOG.log(Level.SEVERE, "[SQL] + Failed to update user '" + user.username
+            LOG.log(Level.SEVERE, "[SQL] + Failed to update user '" + user.getUsername()
                     + "'\n" + "[SQL] | Error message: '" + e.getLocalizedMessage()
                     + "'\n" + "[SQL] | Statement: '" + sql + "'");
             return -1;
@@ -181,7 +181,7 @@ public class MySQLDataLink implements DataLink {
     }
 
     public boolean commitTransaction(Transaction t) {
-        if (t.getAccount().user_id == 0) {
+        if (t.getAccount().getUser_id() == 0) {
             return false;
         }
         String sql = prepareTransactionStatement(t);
@@ -191,7 +191,7 @@ public class MySQLDataLink implements DataLink {
             statement.close();
             return true;
         } catch (SQLException e) {
-            LOG.log(Level.SEVERE, "[SQL] + Failed to commit transaction (" + t.getAccount().username
+            LOG.log(Level.SEVERE, "[SQL] + Failed to commit transaction (" + t.getAccount().getUsername()
                     + ", " + t.getAmountPaid() + ", '" + t.getDescription()
                     + "'\n" + "[SQL] | Error message: '" + e.getLocalizedMessage()
                     + "'\n" + "[SQL] | Statement: '" + sql + "'");
@@ -268,7 +268,7 @@ public class MySQLDataLink implements DataLink {
             }
             return false;
         } catch (SQLException e) {
-            LOG.log(Level.SEVERE, "[SQL] + Failed to delete user '" + user.username
+            LOG.log(Level.SEVERE, "[SQL] + Failed to delete user '" + user.getUsername()
                     + "'\n" + "[SQL] | Error message: '" + e.getLocalizedMessage()
                     + "'\n" + "[SQL] | Statement: '" + sql + "'");
             return false;
@@ -287,7 +287,8 @@ public class MySQLDataLink implements DataLink {
     }
 
     private boolean initBrowser() throws SQLException {
-        this.userBrowser = link.prepareStatement("SELECT * FROM `users` WHERE"
+        // TODO: TEST
+        this.userBrowser = link.prepareStatement("SELECT id, username, room, surname, givenname, email, expiration_date FROM `users` WHERE"
                 + "`username` LIKE ? OR `room` LIKE ? OR `surname` LIKE ? "
                 + "OR `givenname` LIKE ? ORDER BY `username` ASC;");
         return true;
@@ -304,13 +305,16 @@ public class MySQLDataLink implements DataLink {
     private String prepareInsertStatement(User u) {
         String statement = "INSERT INTO users SET ";
 
-        statement += "username='" + u.username + "',";
-        statement += "password='" + u.password + "',";
-        statement += "room='" + u.room + "',";
-        statement += "surname='" + u.surname + "',";
-        statement += "givenname='" + u.givenname + "',";
-        statement += "email='" + u.email + "',";
-        statement += "expiration_date='" + u.expirationDate + "';";
+        statement += "username='" + u.getUsername() + "',";
+        if(u.passwordChanged())
+        {
+            statement += "password='" + u.getPassword() + "',";
+        }
+        statement += "room='" + u.getRoom() + "',";
+        statement += "surname='" + u.getSurname() + "',";
+        statement += "givenname='" + u.getGivenname() + "',";
+        statement += "email='" + u.getEmail() + "',";
+        statement += "expiration_date='" + u.getExpirationDate() + "';";
 
         return statement;
     }
@@ -318,19 +322,29 @@ public class MySQLDataLink implements DataLink {
     private String prepareUpdateStatement(User u) {
         String statement = "UPDATE users SET ";
 
-        statement += "username='" + u.username + "',";
+        /*statement += "username='" + u.username + "',";
         statement += "password='" + u.password + "',";
         statement += "room='" + u.room + "',";
         statement += "surname='" + u.surname + "',";
         statement += "givenname='" + u.givenname + "',";
         statement += "email='" + u.email + "',";
-
+*/
+        statement += "username='" + u.getUsername() + "',";
+        if(u.passwordChanged())
+        {
+            statement += "password='" + u.getPassword() + "',";
+        }
+        statement += "room='" + u.getRoom() + "',";
+        statement += "surname='" + u.getSurname() + "',";
+        statement += "givenname='" + u.getGivenname() + "',";
+        statement += "email='" + u.getEmail() + "',";
+        
         statement += "expiration_date="
-                + (u.expirationDate.isEmpty()
+                + (u.getExpirationDate().isEmpty()
                         ? "NULL"
-                        : "'" + u.expirationDate + "'");
+                        : "'" + u.getExpirationDate() + "'");
 
-        statement += " WHERE id=" + u.user_id + ";";
+        statement += " WHERE id=" + u.getUser_id() + ";";
 
         return statement;
     }
@@ -343,20 +357,21 @@ public class MySQLDataLink implements DataLink {
          * should suffice.
          */
 
-        return "DELETE FROM `users` WHERE `id` = '" + user.user_id + "'";
+        return "DELETE FROM `users` WHERE `id` = '" + user.getUser_id() + "'";
     }
 
     private String prepareTransactionStatement(Transaction t) {
         String statement = "INSERT INTO `transactions` ";
         statement += "(`operator`, `user`, `username`, `amount_paid`, `comment`) VALUES ";
-        statement += "(CURRENT_USER(), '" + t.getAccount().user_id + "', '"
-                + t.getAccount().username + "', '" + t.getAmountPaid() + "', '"
+        statement += "(CURRENT_USER(), '" + t.getAccount().getUser_id() + "', '"
+                + t.getAccount().getUsername() + "', '" + t.getAmountPaid() + "', '"
                 + t.getDescription() + "');";
         return statement;
     }
 
     private String prepareLookupTransactionStatement(User user) {
-        String statement = "SELECT * FROM `transactions` WHERE user=" + user.user_id + " ORDER BY `timestamp` DESC;";
+        String statement = "SELECT * FROM `transactions` WHERE user=" + 
+                user.getUser_id() + " ORDER BY `timestamp` DESC;";
         return statement;
     }
 

@@ -329,7 +329,8 @@ public class MainView extends javax.swing.JFrame {
     }//GEN-LAST:event_btnShowTransactionsActionPerformed
 
     private void addRow(User u, DefaultTableModel model){
-        model.addRow(new Object[]{u.username, u.room, u.surname, u.givenname, u.expirationDate});
+        model.addRow(new Object[]{u.getUsername(), u.getRoom(), u.getSurname(),
+            u.getGivenname(), u.getExpirationDate()});
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCreate;

@@ -29,7 +29,7 @@ public class EditCreateForm extends javax.swing.JFrame {
         this.control = control;
         initComponents();
         if(showing !=null){
-            String room = showing.room;
+            String room = showing.getRoom();
             String[] parts = room.split("-");
             if(parts.length>0){
                 textFieldRoomNumber1.setText(parts[0]);
@@ -43,15 +43,15 @@ public class EditCreateForm extends javax.swing.JFrame {
             if(parts.length>3){
                 textFieldRoomNumber4.setText(parts[3]);
             }
-            passwordField.setText(showing.password);
-            passwordFieldCheck.setText(showing.password);
-            textFieldNachname.setText(showing.surname);
-            textFieldVorname.setText(showing.givenname);
-            textFieldUsername.setText(showing.username);
-            textFieldEMail.setText(showing.email);
-            txtExpDate.setText(showing.expirationDate);
-            jLabelUserID.setText("" + showing.user_id);
-            userID = showing.user_id;
+            passwordField.setText("");
+            passwordFieldCheck.setText("");
+            textFieldNachname.setText(showing.getSurname());
+            textFieldVorname.setText(showing.getGivenname());
+            textFieldUsername.setText(showing.getUsername());
+            textFieldEMail.setText(showing.getEmail());
+            txtExpDate.setText(showing.getExpirationDate());
+            jLabelUserID.setText("" + showing.getUser_id());
+            userID = showing.getUser_id();
         } else {
             txtExpDate.setText(control.getNextExpDate());
         }
@@ -286,7 +286,8 @@ public class EditCreateForm extends javax.swing.JFrame {
         if(u !=null){
             this.setVisible(false);
             if(userID != null){
-                u.user_id =userID;
+                //TODO!!! dirty!!! da uid ein schlüsselkandidat ist, sollte es eigentlich nicht abänderbar sein
+                u.setUser_id(userID);
                 control.initUpdate(u);
             }else{
                 control.initCreate(u);

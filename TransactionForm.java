@@ -1,6 +1,4 @@
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.logging.Logger;
 
 /*
@@ -47,23 +45,23 @@ public class TransactionForm extends javax.swing.JFrame {
         switch(t){
             case CREATE:
                 textFieldPayment.setText("10,00");
-                lblHeader.setText("Create new account '" +u.username +"':" );
+                lblHeader.setText("Create new account '" +u.getUsername() +"':" );
                 textAreaDescription.setText("Created account.");
                 break;
             case UPDATE:
                 textFieldPayment.setText("0,00");
-                lblHeader.setText("Edit account '" +u.username +"':" );
+                lblHeader.setText("Edit account '" +u.getUsername() +"':" );
                 textAreaDescription.setText("Edited account record.");
                 break;
             case DELETE:
                 textFieldPayment.setText("0,00");
-                lblHeader.setText("Delete account '" +u.username +"':" );
+                lblHeader.setText("Delete account '" +u.getUsername() +"':" );
                 textAreaDescription.setText("Account deleted.");
                 break;
             case EXTEND_VALIDITY:
                 textAreaNewExpDate.setText(control.getNextExpDate());
                 textFieldPayment.setText("10,00");
-                lblHeader.setText("Extend account validity of '" +u.username +"':" );
+                lblHeader.setText("Extend account validity of '" +u.getUsername() +"':" );
                 textAreaDescription.setText("Account validity extended until "+textAreaNewExpDate.getText()+".");
                 break;
         }
@@ -254,7 +252,7 @@ public class TransactionForm extends javax.swing.JFrame {
             try{
                 amount = (int) (Double.parseDouble(textFieldPayment.getText().replace(',', '.'))*100);
             }catch(NumberFormatException e){
-                LOG.severe("Check number format.");
+                LOG.severe("Check number format. Exception: " + e.getMessage());
                 return; 
             }
         }
@@ -271,7 +269,7 @@ public class TransactionForm extends javax.swing.JFrame {
                 control.commitDelete(user, textAreaDescription.getText(), amount);
                 break;
             case EXTEND_VALIDITY:
-                user.expirationDate = textAreaNewExpDate.getText();
+                user.setExpirationDate(textAreaNewExpDate.getText());
                 control.commitExtend(user, textAreaDescription.getText(), amount);
                 break;
         }
