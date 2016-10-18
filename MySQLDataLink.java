@@ -48,6 +48,7 @@ public class MySQLDataLink implements DataLink {
     /**
      * *
      *
+     * Mit einem KeyStore des Benutzers
      * @param server der benutzte Server
      * @param dbname die benutze Datenbank
      * @param user der username
@@ -62,6 +63,10 @@ public class MySQLDataLink implements DataLink {
     public MySQLDataLink(@NotNull String server, @NotNull String dbname, @NotNull String user,
             @NotNull String pw, @NotNull String keyStorePath, @NotNull String keyStorePassword,
             @NotNull String trustStorePath, @NotNull String trustStorePassword) {
+        System.setProperty("javax.net.ssl.keyStore", keyStorePath);
+        System.setProperty("javax.net.ssl.keyStorePassword", keyStorePassword);
+        System.setProperty("javax.net.ssl.trustStore", trustStorePath);
+        System.setProperty("javax.net.ssl.trustStorePassword", trustStorePassword);
         db = new MysqlDataSource();
         db.setServerName(server);
         db.setDatabaseName(dbname);
@@ -69,11 +74,32 @@ public class MySQLDataLink implements DataLink {
         db.setPassword(pw);
         db.setRequireSSL(true);
         db.setUseSSL(true);
-        System.setProperty("javax.net.ssl.keyStore", keyStorePath);
-        System.setProperty("javax.net.ssl.keyStorePassword", keyStorePassword);
+    }
+    
+    /**
+     * *
+     *
+     * Enthält keine KeyStores!!! SSL cert vom server aus only
+     * @param server der benutzte Server
+     * @param dbname die benutze Datenbank
+     * @param user der username
+     * @param pw des usernames passwort
+     * @param trustStorePath der mitgelieferte trust store mit dem SSL Cert des
+     * Servers
+     * @param trustStorePassword das Passwort dazu
+     */
+    public MySQLDataLink(@NotNull String server, @NotNull String dbname, @NotNull String user,
+            @NotNull String pw,
+            @NotNull String trustStorePath, @NotNull String trustStorePassword) {
         System.setProperty("javax.net.ssl.trustStore", trustStorePath);
         System.setProperty("javax.net.ssl.trustStorePassword", trustStorePassword);
-
+        db = new MysqlDataSource();
+        db.setServerName(server);
+        db.setDatabaseName(dbname);
+        db.setUser(user);
+        db.setPassword(pw);
+        db.setRequireSSL(true);
+        db.setUseSSL(true);
     }
 
     public boolean connect() {
