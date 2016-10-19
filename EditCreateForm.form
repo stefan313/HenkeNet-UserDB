@@ -259,6 +259,9 @@
     <Component class="javax.swing.JTextField" name="txtExpDate">
       <Properties>
         <Property name="editable" type="boolean" value="false"/>
+        <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="c8" green="c8" red="c8" type="rgb"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="txtExpDateActionPerformed"/>

@@ -1,4 +1,6 @@
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.logging.Logger;
 
 /*
@@ -36,7 +38,8 @@ public class TransactionForm extends javax.swing.JFrame {
         if(t!=TransactionType.EXTEND_VALIDITY){
             lblExpDate.setVisible(false);
             lblTransData.setVisible(false);
-            textAreaNewExpDate.setVisible(false);
+            lblNewExpDate.setVisible(false);
+            trbTerms.setVisible(false);
             seperator.setVisible(false);
         }
         
@@ -44,25 +47,23 @@ public class TransactionForm extends javax.swing.JFrame {
         
         switch(t){
             case CREATE:
-                textFieldPayment.setText("10,00");
+                lblAmountReceived.setText("0,00");
                 lblHeader.setText("Create new account '" +u.getUsername() +"':" );
                 textAreaDescription.setText("Created account.");
                 break;
             case UPDATE:
-                textFieldPayment.setText("0,00");
+                lblAmountReceived.setText("0,00");
                 lblHeader.setText("Edit account '" +u.getUsername() +"':" );
                 textAreaDescription.setText("Edited account record.");
                 break;
             case DELETE:
-                textFieldPayment.setText("0,00");
+                lblAmountReceived.setText("0,00");
                 lblHeader.setText("Delete account '" +u.getUsername() +"':" );
                 textAreaDescription.setText("Account deleted.");
                 break;
             case EXTEND_VALIDITY:
-                textAreaNewExpDate.setText(control.getNextExpDate());
-                textFieldPayment.setText("10,00");
                 lblHeader.setText("Extend account validity of '" +u.getUsername() +"':" );
-                textAreaDescription.setText("Account validity extended until "+textAreaNewExpDate.getText()+".");
+                updateExpDateValues(0); //Method call.
                 break;
         }
     }
@@ -80,17 +81,18 @@ public class TransactionForm extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        textFieldPayment = new javax.swing.JTextField();
         btnCancel = new javax.swing.JButton();
         btnFinish = new javax.swing.JButton();
         lblTransData = new javax.swing.JLabel();
         lblExpDate = new javax.swing.JLabel();
-        textAreaNewExpDate = new javax.swing.JTextField();
         seperator = new javax.swing.JSeparator();
         jScrollPane1 = new javax.swing.JScrollPane();
         textAreaDescription = new javax.swing.JTextArea();
         jLabel7 = new javax.swing.JLabel();
         lblOperator = new javax.swing.JLabel();
+        trbTerms = new javax.swing.JSlider();
+        lblNewExpDate = new javax.swing.JLabel();
+        lblAmountReceived = new javax.swing.JLabel();
 
         setTitle("Complete transaction");
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -110,8 +112,6 @@ public class TransactionForm extends javax.swing.JFrame {
 
         jLabel4.setText("Description:");
 
-        textFieldPayment.setText("0");
-
         btnCancel.setText("Cancel");
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -130,12 +130,6 @@ public class TransactionForm extends javax.swing.JFrame {
         lblTransData.setOpaque(true);
 
         lblExpDate.setText("New expiration date:");
-
-        textAreaNewExpDate.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                textAreaNewExpDateActionPerformed(evt);
-            }
-        });
 
         jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         jScrollPane1.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
@@ -157,6 +151,20 @@ public class TransactionForm extends javax.swing.JFrame {
 
         lblOperator.setText("username");
 
+        trbTerms.setMaximum(2);
+        trbTerms.setValue(0);
+        trbTerms.setName("trbTerms"); // NOI18N
+        trbTerms.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                trbTermsStateChanged(evt);
+            }
+        });
+
+        lblNewExpDate.setText("2016-04-30");
+        lblNewExpDate.setName("lbl"); // NOI18N
+
+        lblAmountReceived.setText("10,00");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -164,42 +172,46 @@ public class TransactionForm extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblTransData)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(seperator, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGap(42, 42, 42)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jLabel3)
-                                            .addComponent(jLabel4)
-                                            .addComponent(jLabel2)
-                                            .addComponent(lblExpDate)))
-                                    .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGap(32, 32, 32)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addGroup(layout.createSequentialGroup()
-                                                .addComponent(textFieldPayment, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(18, 18, 18)
-                                                .addComponent(jLabel7))
-                                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(lblOperator))
-                                        .addGap(0, 0, Short.MAX_VALUE))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(btnFinish, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(textAreaNewExpDate, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+                        .addComponent(seperator)
                         .addGap(24, 24, 24))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblHeader)
-                        .addGap(0, 0, Short.MAX_VALUE))))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(42, 42, 42)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel3)
+                                    .addComponent(jLabel4)
+                                    .addComponent(jLabel2)))
+                            .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(lblExpDate)
+                                .addComponent(lblTransData)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(50, 50, 50)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(lblAmountReceived)
+                                        .addGap(57, 57, 57)
+                                        .addComponent(jLabel7))
+                                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblOperator))
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnFinish, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(51, 51, 51)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(lblNewExpDate)
+                                        .addGap(0, 0, Short.MAX_VALUE))
+                                    .addComponent(trbTerms, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addGap(48, 48, 48))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -207,27 +219,31 @@ public class TransactionForm extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(lblHeader)
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(lblOperator))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel2)
+                            .addComponent(lblOperator))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel7)
+                            .addComponent(lblAmountReceived))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel4)
+                                .addGap(54, 54, 54)
+                                .addComponent(seperator, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblTransData))
+                    .addComponent(trbTerms, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(textFieldPayment, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel7))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel4)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(26, 26, 26)
-                .addComponent(seperator, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblTransData)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblExpDate)
-                    .addComponent(textAreaNewExpDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
+                    .addComponent(lblNewExpDate))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 46, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnCancel)
                     .addComponent(btnFinish))
@@ -246,11 +262,11 @@ public class TransactionForm extends javax.swing.JFrame {
 
     private void btnFinishActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFinishActionPerformed
         int amount;
-        if(textFieldPayment.getText().equals("")){
+        if(lblAmountReceived.getText().equals("")){
             amount = 0;
         }else{
             try{
-                amount = (int) (Double.parseDouble(textFieldPayment.getText().replace(',', '.'))*100);
+                amount = (int) (Double.parseDouble(lblAmountReceived.getText().replace(',', '.'))*100);
             }catch(NumberFormatException e){
                 LOG.severe("Check number format. Exception: " + e.getMessage());
                 return; 
@@ -262,14 +278,13 @@ public class TransactionForm extends javax.swing.JFrame {
                 control.commitCreate(user, textAreaDescription.getText(), amount);
                 break;
             case UPDATE:
-                
                 control.commitUpdate(user, textAreaDescription.getText(), amount);
                 break;
             case DELETE:
                 control.commitDelete(user, textAreaDescription.getText(), amount);
                 break;
             case EXTEND_VALIDITY:
-                user.setExpirationDate(textAreaNewExpDate.getText());
+                user.setExpirationDate(lblNewExpDate.getText());
                 control.commitExtend(user, textAreaDescription.getText(), amount);
                 break;
         }
@@ -285,15 +300,37 @@ public class TransactionForm extends javax.swing.JFrame {
         control.enableMain();
     }//GEN-LAST:event_formWindowClosed
 
-    private void textAreaNewExpDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textAreaNewExpDateActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_textAreaNewExpDateActionPerformed
-
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         this.setVisible(false);
         control.enableMain();
     }//GEN-LAST:event_formWindowClosing
-
+    
+    private void trbTermsStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_trbTermsStateChanged
+         updateExpDateValues(trbTerms.getValue());
+    }//GEN-LAST:event_trbTermsStateChanged
+    
+    /**
+     * Updates all values of the form, according to the new number of terms selected.
+     * @param terms 
+     */
+    void updateExpDateValues(int terms){
+      //Process Changes of Number of Terms.
+        //Get new ExpDate
+       
+        int oldterms = -1;
+        //check if account is already extended
+        for(int i = 0; i <2; i++){
+            if(control.getNextExpDate(i).equals(user.getExpirationDate())){
+                oldterms = i;
+                break;
+            }
+        }
+        
+        lblNewExpDate.setText(control.getNextExpDate(terms));
+        textAreaDescription.setText("Account validity extended until "+lblNewExpDate.getText()+".");
+        NumberFormat formatter = new DecimalFormat("#0,00");     
+        lblAmountReceived.setText(formatter.format(1000*(terms-oldterms)));  
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
@@ -303,14 +340,15 @@ public class TransactionForm extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lblAmountReceived;
     private javax.swing.JLabel lblExpDate;
     private javax.swing.JLabel lblHeader;
+    private javax.swing.JLabel lblNewExpDate;
     private javax.swing.JLabel lblOperator;
     private javax.swing.JLabel lblTransData;
     private javax.swing.JSeparator seperator;
     private javax.swing.JTextArea textAreaDescription;
-    private javax.swing.JTextField textAreaNewExpDate;
-    private javax.swing.JTextField textFieldPayment;
+    private javax.swing.JSlider trbTerms;
     // End of variables declaration//GEN-END:variables
     
 }

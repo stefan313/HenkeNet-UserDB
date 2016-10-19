@@ -168,11 +168,11 @@ public class MySQLDataLink implements DataLink {
             return -1;
         }
     }
-
+   
     public int update(User user, String comment) {
         return update(user, comment, 0);
     }
-
+    
     public int update(User user, String comment, int amountReceivedInCents) {
         if (!commitTransaction(new Transaction(user, amountReceivedInCents, comment))) {
             return -1;
@@ -222,7 +222,7 @@ public class MySQLDataLink implements DataLink {
                         new User(
                                 Integer.parseInt(result.getString("id")),
                                 result.getString("username"),
-                                result.getString("password"),
+                                "",
                                 result.getString("room"),
                                 result.getString("surname"),
                                 result.getString("givenname"),

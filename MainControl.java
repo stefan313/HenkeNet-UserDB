@@ -1,4 +1,4 @@
-﻿/*
+/**
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -104,20 +104,19 @@ public class MainControl {
     void trylogin() {
         //zur DB verbinden
 
-        /*
         dataSource = new MySQLDataLink(
                 "shelldon",
                 "radius",
                 loginView.getTxtUser().getText(),
                 String.valueOf(loginView.getTxtPassword().getPassword())
         );
-         */
+        
         
         // TODO server name und datenbank name in die config auslagern! #gegenHardcode!
         
         //neuer Konstruktor initialize muss vorher ausgeführt werden!
 	// ueberpruefung dass auch alles gesetzt wurde!
-	if (!(trustStorePath == null || trustStorePassword == null))
+	/*if (!(trustStorePath == null || trustStorePassword == null))
 	{
 		if(keyStorePath == null || keyStorePassword == null)
 		{
@@ -143,7 +142,7 @@ public class MainControl {
 		//		geh kaputt
 		LOG.severe("Faulty Config");
 		System.exit(1);
-	}
+	}*/
 
 	if (!(dataSource.connect())) {
 		LOG.severe("Failed to connect.");
@@ -308,7 +307,22 @@ public class MainControl {
      * @return String representation of the next expiration date.
      */
     public String getNextExpDate() {
+        return getNextExpDate(0);
+    }
+    
+    /**
+     * Get next expiration date for "Extend Validity".
+     * From January to March this will be Apr 30 in the same year.
+     * From April to September this will be Oct 31 in the same year.
+     * From October to December this will be Apr 30 next year.
+     * @return String representation of the next expiration date.
+     * @param terms Number of terms to extend. Default 0, otherwise 6 month 
+     * will be addes to the next exp date.
+     * @return String representation of the expiration date.
+     */
+    public String getNextExpDate(int terms) {
         Calendar c = Calendar.getInstance();
+        c.add(Calendar.MONTH, 6*terms);
         int month = c.get(Calendar.MONTH);
         String ret;
         //Sommersemester, validate until october

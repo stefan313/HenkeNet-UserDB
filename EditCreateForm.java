@@ -151,6 +151,7 @@ public class EditCreateForm extends javax.swing.JFrame {
         txtStatusBar.setName("txtStatusBar"); // NOI18N
 
         txtExpDate.setEditable(false);
+        txtExpDate.setBackground(new java.awt.Color(200, 200, 200));
         txtExpDate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtExpDateActionPerformed(evt);
