@@ -1,4 +1,5 @@
 
+import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
@@ -23,7 +24,10 @@ public class EditCreateForm extends javax.swing.JFrame {
     private final static Logger LOG = Logger.getLogger("*");
     
     /**
-     * Creates new form EditCreateForm
+     * Create a new Edit/Create form. 
+     * @param control The Control object.
+     * @param showing The user currently showing. When creating a new account
+     * this param must be set to null.
      */
     public EditCreateForm(MainControl control, User showing) {
         this.control = control;
@@ -53,9 +57,10 @@ public class EditCreateForm extends javax.swing.JFrame {
             jLabelUserID.setText("" + showing.getUser_id());
             userID = showing.getUser_id();
         } else {
-            txtExpDate.setText(control.getNextExpDate());
+            txtExpDate.setText(control.getThisExpDate());
         }
     }
+ 
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -145,6 +150,7 @@ public class EditCreateForm extends javax.swing.JFrame {
         txtStatusBar.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         txtStatusBar.setName("txtStatusBar"); // NOI18N
 
+        txtExpDate.setEditable(false);
         txtExpDate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtExpDateActionPerformed(evt);
