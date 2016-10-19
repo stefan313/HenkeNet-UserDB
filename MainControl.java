@@ -299,22 +299,14 @@ public class MainControl {
 	    mainView.updateBrowserView();
     }
 
-    /**
-     * Get next expiration date for "Extend Validity".
-     * From January to March this will be Apr 30 in the same year.
-     * From April to September this will be Oct 31 in the same year.
-     * From October to December this will be Apr 30 next year.
-     * @return String representation of the next expiration date.
-     */
-    public String getNextExpDate() {
-        return getNextExpDate(0);
-    }
+
+    //EXP DATE CALCULATION METHODS
     
     /**
-     * Get next expiration date for "Extend Validity".
-     * From January to March this will be Apr 30 in the same year.
-     * From April to September this will be Oct 31 in the same year.
-     * From October to December this will be Apr 30 next year.
+     * Get the next or an expiration date terms ahead for "Extend Validity".
+     * From January to February this will be Apr 30 in the same year.
+     * From March to August this will be Oct 31 in the same year.
+     * From September to December this will be Apr 30 next year.
      * @return String representation of the next expiration date.
      * @param terms Number of terms to extend. Default 0, otherwise 6 month 
      * will be addes to the next exp date.
@@ -326,11 +318,11 @@ public class MainControl {
         int month = c.get(Calendar.MONTH);
         String ret;
         //Sommersemester, validate until october
-        if (month >= 3 && month <= 8) {
+        if (month >= 2 && month <= 7) {
             ret = c.get(Calendar.YEAR) + "-10-31";
         } else {
             //Wintersemester, valdiate until april
-            if(month > 8){
+            if(month > 7){
                 ret = (c.get(Calendar.YEAR) + 1) + "-04-30";
             } else {
                 ret = (c.get(Calendar.YEAR)) + "-04-30";
@@ -338,7 +330,15 @@ public class MainControl {
         }
         return ret;
     }
-
+    
+     /**
+     * Get next expiration date for "Extend Validity".
+     * @return String representation of the next expiration date.
+     */
+    public String getNextExpDate() {
+        return getNextExpDate(0);
+    }
+    
      /**
      * Get the first expiration date for a newly create account.
      * In month between March and Aug. it is set to Apr 30.
@@ -346,24 +346,10 @@ public class MainControl {
      * @return The expiration date
      */
     public String getThisExpDate(){
-        Calendar c = Calendar.getInstance();
-        int month = c.get(Calendar.MONTH);
-        String ret;
-        //Sommersemester, set to april.
-        if (month >= 2 && month <= 7) {
-            ret = c.get(Calendar.YEAR) + "-04-31";
-        } else {
-            //Wintersemester, set to october.
-            if(month > 7){
-                ret = (c.get(Calendar.YEAR)) + "-10-31";
-            } else {
-                //Last years october
-                ret = (c.get(Calendar.YEAR)-1) + "-10-31";
-            }
-        }
-        return ret;
+        return getNextExpDate(-1);
     }
     
+    //LOGGING
     /**
      * Status Bar down on the Main Form.
      */
