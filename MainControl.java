@@ -1,4 +1,4 @@
-/*
+﻿/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -116,24 +116,44 @@ public class MainControl {
         // TODO server name und datenbank name in die config auslagern! #gegenHardcode!
         
         //neuer Konstruktor initialize muss vorher ausgeführt werden!
-        dataSource = new MySQLDataLink("shelldon",
-                "radius",
-                loginView.getTxtUser().getText(),
-                String.valueOf(loginView.getTxtPassword().getPassword()),
-                keyStorePath,
-                keyStorePassword,
-                trustStorePath,
-                trustStorePassword);
+	// ueberpruefung dass auch alles gesetzt wurde!
+	if (!(trustStorePath == null || trustStorePassword == null))
+	{
+		if(keyStorePath == null || keyStorePassword == null)
+		{
+			// falls kein client key vorliegt
+			dataSource = new MySQLDataLink("shelldon",
+					"radius",
+					loginView.getTxtUser().getText(),
+					String.valueOf(loginView.getTxtPassword().getPassword()),
+					trustStorePath,
+					trustStorePassword);
+		} else {
+			// mit client keys
+			dataSource = new MySQLDataLink("shelldon",
+					"radius",
+					loginView.getTxtUser().getText(),
+					String.valueOf(loginView.getTxtPassword().getPassword()),
+					keyStorePath,
+					keyStorePassword,
+					trustStorePath,
+					trustStorePassword);
+		}
+	} else {
+		//		geh kaputt
+		LOG.severe("Faulty Config");
+		System.exit(1);
+	}
 
-        if (!(dataSource.connect())) {
-            LOG.severe("Failed to connect.");
-            return;
-        }
+	if (!(dataSource.connect())) {
+		LOG.severe("Failed to connect.");
+		return;
+	}
 
-        dbuser = loginView.getTxtUser().getText();
-        loginView.setVisible(false);
-        mainView = new MainView(this);
-        mainView.setVisible(true);
+	dbuser = loginView.getTxtUser().getText();
+	loginView.setVisible(false);
+	mainView = new MainView(this);
+	mainView.setVisible(true);
 
     }
     /**
@@ -142,13 +162,13 @@ public class MainControl {
      * @param selected The User currently selected, can be null.
      */
     void showECForm(User selected) {
-        this.mainView.setEnabled(false);
-        this.ecView = new EditCreateForm(this, selected);
-        this.ecView.setVisible(true);
+	    this.mainView.setEnabled(false);
+	    this.ecView = new EditCreateForm(this, selected);
+	    this.ecView.setVisible(true);
     }
 
     List<User> doSearch(String searchText) {
-        return dataSource.lookupUser(searchText);
+	    return dataSource.lookupUser(searchText);
     }
     
     /**
@@ -157,11 +177,11 @@ public class MainControl {
      * @param u The User-Object with data.
      */
     void initCreate(User u) {
-        //Transaktionsfenster öffnen
-        mainView.setEnabled(false);
-        transactionView = new TransactionForm(this, TransactionForm.TransactionType.CREATE,
-                u, dbuser);
-        transactionView.setVisible(true);
+	    //Transaktionsfenster öffnen
+	    mainView.setEnabled(false);
+	    transactionView = new TransactionForm(this, TransactionForm.TransactionType.CREATE,
+			    u, dbuser);
+	    transactionView.setVisible(true);
     }
     
     /**
@@ -171,14 +191,14 @@ public class MainControl {
      * @param amount Amount received in Cents.
      */
     void commitCreate(User u, String comment, int amount) {
-        //Daten zur DB senden
-        //Insert Username and Pw
-        if (dataSource.insert(u, comment, amount) != -1) {
-            LOG.info("[SUCCESS] Added user '" + u.getUsername() + "'");
-        } else {
-            LOG.log(Level.SEVERE, "[FAIL] Failed to insert user '" + u.getUsername() + "'");
-        }
-        enableMain();
+	    //Daten zur DB senden
+	    //Insert Username and Pw
+	    if (dataSource.insert(u, comment, amount) != -1) {
+		    LOG.info("[SUCCESS] Added user '" + u.getUsername() + "'");
+	    } else {
+		    LOG.log(Level.SEVERE, "[FAIL] Failed to insert user '" + u.getUsername() + "'");
+	    }
+	    enableMain();
     }
     
     /**
@@ -187,10 +207,10 @@ public class MainControl {
      * @param u The User to update.
      */
     void initUpdate(User u) {
-        mainView.setEnabled(false);
-        transactionView = new TransactionForm(this, TransactionForm.TransactionType.UPDATE,
-                u, dbuser);
-        transactionView.setVisible(true);
+	    mainView.setEnabled(false);
+	    transactionView = new TransactionForm(this, TransactionForm.TransactionType.UPDATE,
+			    u, dbuser);
+	    transactionView.setVisible(true);
 
     }
     /**
@@ -200,12 +220,12 @@ public class MainControl {
      * @param amount Amount received in cents.
      */
     void commitUpdate(User u, String comment, int amount) {
-        if (dataSource.update(u, comment, amount) != -1) {
-            LOG.info("[SUCCESS] Updated user '" + u.getUsername() + "'");
-        } else {
-            LOG.log(Level.SEVERE, "[FAIL] Failed to update user '" + u.getUsername() + "'");
-        }
-        enableMain();
+	    if (dataSource.update(u, comment, amount) != -1) {
+		    LOG.info("[SUCCESS] Updated user '" + u.getUsername() + "'");
+	    } else {
+		    LOG.log(Level.SEVERE, "[FAIL] Failed to update user '" + u.getUsername() + "'");
+	    }
+	    enableMain();
     }
     /** 
      * Start a deleting action.
@@ -213,10 +233,10 @@ public class MainControl {
      * @param u The User to be deleted.
      */
     void initDelete(User u) {
-        mainView.setEnabled(false);
-        transactionView = new TransactionForm(this, TransactionForm.TransactionType.DELETE,
-                u, dbuser);
-        transactionView.setVisible(true);
+	    mainView.setEnabled(false);
+	    transactionView = new TransactionForm(this, TransactionForm.TransactionType.DELETE,
+			    u, dbuser);
+	    transactionView.setVisible(true);
     }
     /**
      * Delete a user record.
@@ -225,9 +245,9 @@ public class MainControl {
      * @param amount Amount received in Cents.
      */
     void commitDelete(User u, String comment, int amount) {
-        dataSource.delete(u, comment, amount);
-        LOG.info("[SUCCESS] Deleted user '" + u.getUsername() + "'");
-        enableMain();
+	    dataSource.delete(u, comment, amount);
+	    LOG.info("[SUCCESS] Deleted user '" + u.getUsername() + "'");
+	    enableMain();
     }
     /**
      * Start an extending action.
@@ -235,10 +255,10 @@ public class MainControl {
      * @param u The User to be extended.
      */
     void initExtend(User u) {
-        mainView.setEnabled(false);
-        transactionView = new TransactionForm(this, TransactionForm.TransactionType.EXTEND_VALIDITY,
-                u, dbuser);
-        transactionView.setVisible(true);
+	    mainView.setEnabled(false);
+	    transactionView = new TransactionForm(this, TransactionForm.TransactionType.EXTEND_VALIDITY,
+			    u, dbuser);
+	    transactionView.setVisible(true);
     }
     /**
      * Extend a users validity.
@@ -247,26 +267,26 @@ public class MainControl {
      * @param amount Money recieved in cents.
      */
     void commitExtend(User u, String comment, int amount) {
-        if (dataSource.update(u, comment, amount) != -1) {
-            LOG.info("[SUCCESS] Extended user '" + u.getUsername() + "'");
-        } else {
-            LOG.log(Level.SEVERE, "[FAIL] Failed to extend user '" + u.getUsername() + "'");
-        }
-        enableMain();
+	    if (dataSource.update(u, comment, amount) != -1) {
+		    LOG.info("[SUCCESS] Extended user '" + u.getUsername() + "'");
+	    } else {
+		    LOG.log(Level.SEVERE, "[FAIL] Failed to extend user '" + u.getUsername() + "'");
+	    }
+	    enableMain();
     }
     /**
      * Shows the History View Form.
      * @param u The selected user.
      */
     void showTransactionHistory(User u) {
-        new TransactionHistoryView(dataSource, u).setVisible(true);
+	    new TransactionHistoryView(dataSource, u).setVisible(true);
     }
 
     /**
      * Closes the connection to the data source.
      */
     public void closeConn() {
-        dataSource.disconnect();
+	    dataSource.disconnect();
     }
 
     /**
@@ -274,10 +294,10 @@ public class MainControl {
      * Control is passed back to Main.
      */
     public void enableMain() {
-        this.mainView.setEnabled(true);
-        mainView.setVisible(true);
-        mainView.setState(Frame.NORMAL);
-        mainView.updateBrowserView();
+	    this.mainView.setEnabled(true);
+	    mainView.setVisible(true);
+	    mainView.setState(Frame.NORMAL);
+	    mainView.updateBrowserView();
     }
 
     /**
