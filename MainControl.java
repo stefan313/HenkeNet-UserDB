@@ -107,11 +107,12 @@ public class MainControl {
         // TODO server name und datenbank name in die config auslagern! #gegenHardcode!
         
         //neuer Konstruktor initialize muss vorher ausgeführt werden!
-
+	// ueberpruefung dass auch alles gesetzt wurde!
 	if (!(trustStorePath == null || trustStorePassword == null))
 	{
 		if(keyStorePath == null || keyStorePassword == null)
 		{
+			// falls kein client key vorliegt
 			dataSource = new MySQLDataLink("shelldon",
 					"radius",
 					loginView.getTxtUser().getText(),
@@ -119,6 +120,7 @@ public class MainControl {
 					trustStorePath,
 					trustStorePassword);
 		} else {
+			// mit client keys
 			dataSource = new MySQLDataLink("shelldon",
 					"radius",
 					loginView.getTxtUser().getText(),
@@ -131,6 +133,7 @@ public class MainControl {
 	} else {
 		//		geh kaputt
 		LOG.severe("Faulty Config");
+		System.exit(1);
 	}
 
 	if (!(dataSource.connect())) {
