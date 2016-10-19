@@ -107,149 +107,166 @@ public class MainControl {
         // TODO server name und datenbank name in die config auslagern! #gegenHardcode!
         
         //neuer Konstruktor initialize muss vorher ausgeführt werden!
-        dataSource = new MySQLDataLink("shelldon",
-                "radius",
-                loginView.getTxtUser().getText(),
-                String.valueOf(loginView.getTxtPassword().getPassword()),
-                keyStorePath,
-                keyStorePassword,
-                trustStorePath,
-                trustStorePassword);
 
-        if (!(dataSource.connect())) {
-            LOG.severe("Failed to connect.");
-            return;
-        }
+	if (!(trustStorePath == null || trustStorePassword == null))
+	{
+		if(keyStorePath == null || keyStorePassword == null)
+		{
+			dataSource = new MySQLDataLink("shelldon",
+					"radius",
+					loginView.getTxtUser().getText(),
+					String.valueOf(loginView.getTxtPassword().getPassword()),
+					trustStorePath,
+					trustStorePassword);
+		} else {
+			dataSource = new MySQLDataLink("shelldon",
+					"radius",
+					loginView.getTxtUser().getText(),
+					String.valueOf(loginView.getTxtPassword().getPassword()),
+					keyStorePath,
+					keyStorePassword,
+					trustStorePath,
+					trustStorePassword);
+		}
+	} else {
+		//		geh kaputt
+		LOG.severe("Faulty Config");
+	}
 
-        dbuser = loginView.getTxtUser().getText();
-        loginView.setVisible(false);
-        mainView = new MainView(this);
-        mainView.setVisible(true);
+	if (!(dataSource.connect())) {
+		LOG.severe("Failed to connect.");
+		return;
+	}
+
+	dbuser = loginView.getTxtUser().getText();
+	loginView.setVisible(false);
+	mainView = new MainView(this);
+	mainView.setVisible(true);
 
     }
 
     void showECForm(User selected) {
-        this.mainView.setEnabled(false);
-        this.ecView = new EditCreateForm(this, selected);
-        this.ecView.setVisible(true);
+	    this.mainView.setEnabled(false);
+	    this.ecView = new EditCreateForm(this, selected);
+	    this.ecView.setVisible(true);
     }
 
     List<User> doSearch(String searchText) {
-        return dataSource.lookupUser(searchText);
+	    return dataSource.lookupUser(searchText);
     }
 
     void initCreate(User u) {
-        //Transaktionsfenster öffnen
-        mainView.setEnabled(false);
-        transactionView = new TransactionForm(this, TransactionForm.TransactionType.CREATE,
-                u, dbuser);
-        transactionView.setVisible(true);
+	    //Transaktionsfenster öffnen
+	    mainView.setEnabled(false);
+	    transactionView = new TransactionForm(this, TransactionForm.TransactionType.CREATE,
+			    u, dbuser);
+	    transactionView.setVisible(true);
     }
 
     void commitCreate(User u, String comment, int amount) {
-        //Daten zur DB senden
-        //Insert Username and Pw
-        if (dataSource.insert(u, comment, amount) != -1) {
-            LOG.info("[SUCCESS] Added user '" + u.getUsername() + "'");
-        } else {
-            LOG.log(Level.SEVERE, "[FAIL] Failed to insert user '" + u.getUsername() + "'");
-        }
-        enableMain();
+	    //Daten zur DB senden
+	    //Insert Username and Pw
+	    if (dataSource.insert(u, comment, amount) != -1) {
+		    LOG.info("[SUCCESS] Added user '" + u.getUsername() + "'");
+	    } else {
+		    LOG.log(Level.SEVERE, "[FAIL] Failed to insert user '" + u.getUsername() + "'");
+	    }
+	    enableMain();
     }
 
     void initUpdate(User u) {
-        mainView.setEnabled(false);
-        transactionView = new TransactionForm(this, TransactionForm.TransactionType.UPDATE,
-                u, dbuser);
-        transactionView.setVisible(true);
+	    mainView.setEnabled(false);
+	    transactionView = new TransactionForm(this, TransactionForm.TransactionType.UPDATE,
+			    u, dbuser);
+	    transactionView.setVisible(true);
 
     }
 
     void commitUpdate(User u, String comment, int amount) {
-        if (dataSource.update(u, comment, amount) != -1) {
-            LOG.info("[SUCCESS] Updated user '" + u.getUsername() + "'");
-        } else {
-            LOG.log(Level.SEVERE, "[FAIL] Failed to update user '" + u.getUsername() + "'");
-        }
-        enableMain();
+	    if (dataSource.update(u, comment, amount) != -1) {
+		    LOG.info("[SUCCESS] Updated user '" + u.getUsername() + "'");
+	    } else {
+		    LOG.log(Level.SEVERE, "[FAIL] Failed to update user '" + u.getUsername() + "'");
+	    }
+	    enableMain();
     }
 
     void initDelete(User u) {
-        mainView.setEnabled(false);
-        transactionView = new TransactionForm(this, TransactionForm.TransactionType.DELETE,
-                u, dbuser);
-        transactionView.setVisible(true);
+	    mainView.setEnabled(false);
+	    transactionView = new TransactionForm(this, TransactionForm.TransactionType.DELETE,
+			    u, dbuser);
+	    transactionView.setVisible(true);
     }
 
     void commitDelete(User u, String comment, int amount) {
-        dataSource.delete(u, comment, amount);
-        LOG.info("[SUCCESS] Deleted user '" + u.getUsername() + "'");
-        enableMain();
+	    dataSource.delete(u, comment, amount);
+	    LOG.info("[SUCCESS] Deleted user '" + u.getUsername() + "'");
+	    enableMain();
     }
 
     void initExtend(User u) {
-        mainView.setEnabled(false);
-        transactionView = new TransactionForm(this, TransactionForm.TransactionType.EXTEND_VALIDITY,
-                u, dbuser);
-        transactionView.setVisible(true);
+	    mainView.setEnabled(false);
+	    transactionView = new TransactionForm(this, TransactionForm.TransactionType.EXTEND_VALIDITY,
+			    u, dbuser);
+	    transactionView.setVisible(true);
     }
 
     void commitExtend(User u, String comment, int amount) {
-        if (dataSource.update(u, comment, amount) != -1) {
-            LOG.info("[SUCCESS] Extended user '" + u.getUsername() + "'");
-        } else {
-            LOG.log(Level.SEVERE, "[FAIL] Failed to extend user '" + u.getUsername() + "'");
-        }
-        enableMain();
+	    if (dataSource.update(u, comment, amount) != -1) {
+		    LOG.info("[SUCCESS] Extended user '" + u.getUsername() + "'");
+	    } else {
+		    LOG.log(Level.SEVERE, "[FAIL] Failed to extend user '" + u.getUsername() + "'");
+	    }
+	    enableMain();
     }
 
     void showTransactionHistory(User u) {
-        new TransactionHistoryView(dataSource, u).setVisible(true);
+	    new TransactionHistoryView(dataSource, u).setVisible(true);
     }
 
     public void closeConn() {
-        dataSource.disconnect();
+	    dataSource.disconnect();
     }
 
     public void enableMain() {
-        this.mainView.setEnabled(true);
-        mainView.setVisible(true);
-        mainView.setState(Frame.NORMAL);
-        mainView.updateBrowserView();
+	    this.mainView.setEnabled(true);
+	    mainView.setVisible(true);
+	    mainView.setState(Frame.NORMAL);
+	    mainView.updateBrowserView();
     }
 
     //Get next expiration date for "Extend Validity"
     public String getNextExpDate() {
-        Calendar c = Calendar.getInstance();
-        int month = c.get(Calendar.MONTH);
-        String ret;
-        //Sommersemester, validate until october
-        if (month >= 3 && month <= 8) {
-            ret = c.get(Calendar.YEAR) + "-10-31";
-        } else {
-            //Wintersemester, valdiate until april
-            ret = (c.get(Calendar.YEAR) + 1) + "-04-30";
-        }
-        return ret;
+	    Calendar c = Calendar.getInstance();
+	    int month = c.get(Calendar.MONTH);
+	    String ret;
+	    //Sommersemester, validate until october
+	    if (month >= 3 && month <= 8) {
+		    ret = c.get(Calendar.YEAR) + "-10-31";
+	    } else {
+		    //Wintersemester, valdiate until april
+		    ret = (c.get(Calendar.YEAR) + 1) + "-04-30";
+	    }
+	    return ret;
     }
 
     public class StatusBar extends StreamHandler {
 
-        public void publish(LogRecord rec) {
-            if (mainView != null) {
-                mainView.getStatusBar().setText(rec.getMessage());
-                if (rec.getLevel().intValue() >= Level.SEVERE.intValue()) {
-                    mainView.getStatusBar().setForeground(Color.RED);
-                } else {
-                    mainView.getStatusBar().setForeground(Color.BLACK);
-                }
-            }
+	    public void publish(LogRecord rec) {
+		    if (mainView != null) {
+			    mainView.getStatusBar().setText(rec.getMessage());
+			    if (rec.getLevel().intValue() >= Level.SEVERE.intValue()) {
+				    mainView.getStatusBar().setForeground(Color.RED);
+			    } else {
+				    mainView.getStatusBar().setForeground(Color.BLACK);
+			    }
+		    }
 
-            if (loginView != null) {
-                loginView.getLblStatusBar().setText("Try again.");
-                // message unhelpful. try again.
-            }
+		    if (loginView != null) {
+			    loginView.getLblStatusBar().setText("Try again.");
+			    // message unhelpful. try again.
+		    }
 
-        }
+	    }
     }
 }
