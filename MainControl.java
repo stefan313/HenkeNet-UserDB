@@ -17,7 +17,6 @@ import java.util.logging.LogRecord;
 import java.util.List;
 
 /**
- *
  * @author Stefan, Tobias
  */
 public class MainControl {
@@ -94,198 +93,213 @@ public class MainControl {
     }
 
     /**
-     *  Main Method. Start of program.
-     *  @param args Command-Line args.
+     * Main Method. Start of program.
+     *
+     * @param args Command-Line args.
      */
     public static void main(String[] args) {
         new MainControl();
     }
 
-    void trylogin() {
-        //zur DB verbinden
+    void tryLogin() {
 
-        dataSource = new MySQLDataLink(
-                "shelldon",
-                "radius",
-                loginView.getTxtUser().getText(),
-                String.valueOf(loginView.getTxtPassword().getPassword())
-        );
-        
-        
         // TODO server name und datenbank name in die config auslagern! #gegenHardcode!
-        
+
         //neuer Konstruktor initialize muss vorher ausgeführt werden!
-	// ueberpruefung dass auch alles gesetzt wurde!
-	/*if (!(trustStorePath == null || trustStorePassword == null))
-	{
-		if(keyStorePath == null || keyStorePassword == null)
-		{
-			// falls kein client key vorliegt
-			dataSource = new MySQLDataLink("shelldon",
-					"radius",
-					loginView.getTxtUser().getText(),
-					String.valueOf(loginView.getTxtPassword().getPassword()),
-					trustStorePath,
-					trustStorePassword);
-		} else {
-			// mit client keys
-			dataSource = new MySQLDataLink("shelldon",
-					"radius",
-					loginView.getTxtUser().getText(),
-					String.valueOf(loginView.getTxtPassword().getPassword()),
-					keyStorePath,
-					keyStorePassword,
-					trustStorePath,
-					trustStorePassword);
-		}
-	} else {
-		//		geh kaputt
-		LOG.severe("Faulty Config");
-		System.exit(1);
-	}*/
+        // ueberpruefung dass auch alles gesetzt wurde!
+        if (!(trustStorePath == null || trustStorePassword == null)) {
+            if (keyStorePath == null || keyStorePassword == null) {
+                // falls kein client key vorliegt
+                dataSource = new MySQLDataLink("shelldon",
+                        "radius",
+                        loginView.getTxtUser().getText(),
+                        String.valueOf(loginView.getTxtPassword().getPassword()),
+                        trustStorePath,
+                        trustStorePassword);
+            } else {
+                // mit client keys
+                dataSource = new MySQLDataLink("shelldon",
+                        "radius",
+                        loginView.getTxtUser().getText(),
+                        String.valueOf(loginView.getTxtPassword().getPassword()),
+                        keyStorePath,
+                        keyStorePassword,
+                        trustStorePath,
+                        trustStorePassword);
+            }
+        } else {
+            //zur DB verbinden
 
-	if (!(dataSource.connect())) {
-		LOG.severe("Failed to connect.");
-		return;
-	}
+            dataSource = new MySQLDataLink(
+                    "shelldon",
+                    "radius",
+                    loginView.getTxtUser().getText(),
+                    String.valueOf(loginView.getTxtPassword().getPassword())
+            );
+            //		geh kaputt
+            LOG.severe("Faulty Config, using Fallback (No SSL!!!!)");
+            //System.exit(1);
+        }
 
-	dbuser = loginView.getTxtUser().getText();
-	loginView.setVisible(false);
-	mainView = new MainView(this);
-	mainView.setVisible(true);
+        if (!(dataSource.connect())) {
+            LOG.severe("Failed to connect.");
+            return;
+        }
+
+        dbuser = loginView.getTxtUser().getText();
+        loginView.setVisible(false);
+        mainView = new MainView(this);
+        mainView.setVisible(true);
 
     }
+
     /**
      * Disable main view and show the edit/create Form.
      * This is the first step of Creating / Deleting an account.
+     *
      * @param selected The User currently selected, can be null.
      */
     void showECForm(User selected) {
-	    this.mainView.setEnabled(false);
-	    this.ecView = new EditCreateForm(this, selected);
-	    this.ecView.setVisible(true);
+        this.mainView.setEnabled(false);
+        this.ecView = new EditCreateForm(this, selected);
+        this.ecView.setVisible(true);
     }
 
     List<User> doSearch(String searchText) {
-	    return dataSource.lookupUser(searchText);
+        return dataSource.lookupUser(searchText);
     }
-    
+
     /**
      * Init a creation.
      * Show the Transaction view and disable main.
+     *
      * @param u The User-Object with data.
      */
     void initCreate(User u) {
-	    //Transaktionsfenster öffnen
-	    mainView.setEnabled(false);
-	    transactionView = new TransactionForm(this, TransactionForm.TransactionType.CREATE,
-			    u, dbuser);
-	    transactionView.setVisible(true);
+        //Transaktionsfenster öffnen
+        mainView.setEnabled(false);
+        transactionView = new TransactionForm(this, TransactionForm.TransactionType.CREATE,
+                u, dbuser);
+        transactionView.setVisible(true);
     }
-    
+
     /**
-     * Create a new Account.    
-     * @param u User containing account data.
+     * Create a new Account.
+     *
+     * @param u       User containing account data.
      * @param comment Comment on the action
-     * @param amount Amount received in Cents.
+     * @param amount  Amount received in Cents.
      */
     void commitCreate(User u, String comment, int amount) {
-	    //Daten zur DB senden
-	    //Insert Username and Pw
-	    if (dataSource.insert(u, comment, amount) != -1) {
-		    LOG.info("[SUCCESS] Added user '" + u.getUsername() + "'");
-	    } else {
-		    LOG.log(Level.SEVERE, "[FAIL] Failed to insert user '" + u.getUsername() + "'");
-	    }
-	    enableMain();
+        //Daten zur DB senden
+        //Insert Username and Pw
+        if (dataSource.insert(u, comment, amount) != -1) {
+            LOG.info("[SUCCESS] Added user '" + u.getUsername() + "'");
+        } else {
+            LOG.log(Level.SEVERE, "[FAIL] Failed to insert user '" + u.getUsername() + "'");
+        }
+        enableMain();
     }
-    
+
     /**
      * Init an update action.
      * Show the Update Form and disable the Main View.
+     *
      * @param u The User to update.
      */
     void initUpdate(User u) {
-	    mainView.setEnabled(false);
-	    transactionView = new TransactionForm(this, TransactionForm.TransactionType.UPDATE,
-			    u, dbuser);
-	    transactionView.setVisible(true);
+        mainView.setEnabled(false);
+        transactionView = new TransactionForm(this, TransactionForm.TransactionType.UPDATE,
+                u, dbuser);
+        transactionView.setVisible(true);
 
     }
+
     /**
-     * Update a User record.    
-     * @param u The User to update. 
+     * Update a User record.
+     *
+     * @param u       The User to update.
      * @param comment Comment on the Action
-     * @param amount Amount received in cents.
+     * @param amount  Amount received in cents.
      */
     void commitUpdate(User u, String comment, int amount) {
-	    if (dataSource.update(u, comment, amount) != -1) {
-		    LOG.info("[SUCCESS] Updated user '" + u.getUsername() + "'");
-	    } else {
-		    LOG.log(Level.SEVERE, "[FAIL] Failed to update user '" + u.getUsername() + "'");
-	    }
-	    enableMain();
+        if (dataSource.update(u, comment, amount) != -1) {
+            LOG.info("[SUCCESS] Updated user '" + u.getUsername() + "'");
+        } else {
+            LOG.log(Level.SEVERE, "[FAIL] Failed to update user '" + u.getUsername() + "'");
+        }
+        enableMain();
     }
-    /** 
+
+    /**
      * Start a deleting action.
      * Show Transaction Form and disable Main Form.
+     *
      * @param u The User to be deleted.
      */
     void initDelete(User u) {
-	    mainView.setEnabled(false);
-	    transactionView = new TransactionForm(this, TransactionForm.TransactionType.DELETE,
-			    u, dbuser);
-	    transactionView.setVisible(true);
+        mainView.setEnabled(false);
+        transactionView = new TransactionForm(this, TransactionForm.TransactionType.DELETE,
+                u, dbuser);
+        transactionView.setVisible(true);
     }
+
     /**
      * Delete a user record.
-     * @param u The User to be deleted.
+     *
+     * @param u       The User to be deleted.
      * @param comment Comment on the action.
-     * @param amount Amount received in Cents.
+     * @param amount  Amount received in Cents.
      */
     void commitDelete(User u, String comment, int amount) {
-	    dataSource.delete(u, comment, amount);
-	    LOG.info("[SUCCESS] Deleted user '" + u.getUsername() + "'");
-	    enableMain();
+        dataSource.delete(u, comment, amount);
+        LOG.info("[SUCCESS] Deleted user '" + u.getUsername() + "'");
+        enableMain();
     }
+
     /**
      * Start an extending action.
      * Shows the transaction form and disables the Main View.
+     *
      * @param u The User to be extended.
      */
     void initExtend(User u) {
-	    mainView.setEnabled(false);
-	    transactionView = new TransactionForm(this, TransactionForm.TransactionType.EXTEND_VALIDITY,
-			    u, dbuser);
-	    transactionView.setVisible(true);
+        mainView.setEnabled(false);
+        transactionView = new TransactionForm(this, TransactionForm.TransactionType.EXTEND_VALIDITY,
+                u, dbuser);
+        transactionView.setVisible(true);
     }
+
     /**
      * Extend a users validity.
-     * @param u The user.
+     *
+     * @param u       The user.
      * @param comment Comment to the action.
-     * @param amount Money recieved in cents.
+     * @param amount  Money recieved in cents.
      */
     void commitExtend(User u, String comment, int amount) {
-	    if (dataSource.update(u, comment, amount) != -1) {
-		    LOG.info("[SUCCESS] Extended user '" + u.getUsername() + "'");
-	    } else {
-		    LOG.log(Level.SEVERE, "[FAIL] Failed to extend user '" + u.getUsername() + "'");
-	    }
-	    enableMain();
+        if (dataSource.update(u, comment, amount) != -1) {
+            LOG.info("[SUCCESS] Extended user '" + u.getUsername() + "'");
+        } else {
+            LOG.log(Level.SEVERE, "[FAIL] Failed to extend user '" + u.getUsername() + "'");
+        }
+        enableMain();
     }
+
     /**
      * Shows the History View Form.
+     *
      * @param u The selected user.
      */
     void showTransactionHistory(User u) {
-	    new TransactionHistoryView(dataSource, u).setVisible(true);
+        new TransactionHistoryView(dataSource, u).setVisible(true);
     }
 
     /**
      * Closes the connection to the data source.
      */
     public void closeConn() {
-	    dataSource.disconnect();
+        dataSource.disconnect();
     }
 
     /**
@@ -293,28 +307,28 @@ public class MainControl {
      * Control is passed back to Main.
      */
     public void enableMain() {
-	    this.mainView.setEnabled(true);
-	    mainView.setVisible(true);
-	    mainView.setState(Frame.NORMAL);
-	    mainView.updateBrowserView();
+        this.mainView.setEnabled(true);
+        mainView.setVisible(true);
+        mainView.setState(Frame.NORMAL);
+        mainView.updateBrowserView();
     }
 
 
     //EXP DATE CALCULATION METHODS
-    
+
     /**
      * Get the next or an expiration date terms ahead for "Extend Validity".
      * From January to February this will be Apr 30 in the same year.
      * From March to August this will be Oct 31 in the same year.
      * From September to December this will be Apr 30 next year.
-     * @return String representation of the next expiration date.
-     * @param terms Number of terms to extend. Default 0, otherwise 6 month 
-     * will be addes to the next exp date.
+     *
+     * @param terms Number of terms to extend. Default 0, otherwise 6 month
+     *              will be addes to the next exp date.
      * @return String representation of the expiration date.
      */
     public String getNextExpDate(int terms) {
         Calendar c = Calendar.getInstance();
-        c.add(Calendar.MONTH, 6*terms);
+        c.add(Calendar.MONTH, 6 * terms);
         int month = c.get(Calendar.MONTH);
         String ret;
         //Sommersemester, validate until october
@@ -322,7 +336,7 @@ public class MainControl {
             ret = c.get(Calendar.YEAR) + "-10-31";
         } else {
             //Wintersemester, valdiate until april
-            if(month > 7){
+            if (month > 7) {
                 ret = (c.get(Calendar.YEAR) + 1) + "-04-30";
             } else {
                 ret = (c.get(Calendar.YEAR)) + "-04-30";
@@ -330,32 +344,36 @@ public class MainControl {
         }
         return ret;
     }
-    
-     /**
+
+    /**
      * Get next expiration date for "Extend Validity".
+     *
      * @return String representation of the next expiration date.
      */
     public String getNextExpDate() {
         return getNextExpDate(0);
     }
-    
-     /**
+
+    /**
      * Get the first expiration date for a newly create account.
      * In month between March and Aug. it is set to Apr 30.
      * Else to Oct. 31.
+     *
      * @return The expiration date
      */
-    public String getThisExpDate(){
+    public String getThisExpDate() {
         return getNextExpDate(-1);
     }
-    
+
     //LOGGING
+
     /**
      * Status Bar down on the Main Form.
      */
     public class StatusBar extends StreamHandler {
         /**
          * Publish a logging message (show it on the status bar)
+         *
          * @param rec Message to show.
          */
         public void publish(LogRecord rec) {

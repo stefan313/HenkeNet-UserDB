@@ -6,9 +6,6 @@
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
-import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 /**
@@ -39,6 +36,7 @@ public class LoginForm extends javax.swing.JFrame {
             }
         } catch (ClassNotFoundException ex) {
             java.util.logging.Logger.getLogger(LoginForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            // die folgenden werden jetzt eigentlich nicht wirklich gebraucht?
         } catch (InstantiationException ex) {
             java.util.logging.Logger.getLogger(LoginForm.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
@@ -173,7 +171,7 @@ public class LoginForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOKActionPerformed
-       parentControl.trylogin();
+       parentControl.tryLogin();
     }//GEN-LAST:event_btnOKActionPerformed
 
     private void txtUserFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtUserFocusGained
@@ -185,7 +183,7 @@ public class LoginForm extends javax.swing.JFrame {
     }//GEN-LAST:event_txtPasswordFocusGained
 
     private void txtPasswordKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPasswordKeyReleased
-        if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) parentControl.trylogin();
+        if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) parentControl.tryLogin();
     }//GEN-LAST:event_txtPasswordKeyReleased
 
     private void txtUserKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtUserKeyTyped
@@ -207,11 +205,11 @@ public class LoginForm extends javax.swing.JFrame {
     }//GEN-LAST:event_txtUserMouseClicked
 
     private void txtUserKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtUserKeyReleased
-        if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) parentControl.trylogin();
+        if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) parentControl.tryLogin();
     }//GEN-LAST:event_txtUserKeyReleased
 
     private void btnOKKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_btnOKKeyReleased
-        if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) parentControl.trylogin();
+        if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) parentControl.tryLogin();
     }//GEN-LAST:event_btnOKKeyReleased
 
 
