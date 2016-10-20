@@ -267,6 +267,7 @@ public class MySQLDataLink implements DataLink {
     public boolean delete(User user) {
         String sql = prepareDeleteStatement(user);
         try (Statement state = link.createStatement()) {
+            // returns ob state wie erwarted war //TODO erlaeutern
             return state.executeUpdate(sql) == 1;
         } catch (SQLException e) {
             LOG.log(Level.SEVERE, "[SQL] + Failed to delete user '" + user.getUsername()
@@ -281,7 +282,9 @@ public class MySQLDataLink implements DataLink {
     }
 
     public boolean delete(User user, String comment, int amountReceivedInCents) {
-        return commitTransaction(new Transaction(user, amountReceivedInCents, comment)) && delete(user);
+        // returns ob beide Aktionen erfolgreich waren
+        return commitTransaction(new Transaction(user, amountReceivedInCents, comment))
+                && delete(user);
     }
 
     private boolean initBrowser() throws SQLException {
@@ -371,6 +374,7 @@ public class MySQLDataLink implements DataLink {
     }
 
     private String prepareLookupTransactionStatement(User user) {
+        // returns this lookup statement string on userid
         return "SELECT * FROM `transactions` WHERE user=" +
                 user.getUser_id() + " ORDER BY `timestamp` DESC;";
     }
