@@ -42,6 +42,10 @@ public class MySQLDataLink implements DataLink {
         db.setDatabaseName(dbname);
         db.setUser(user);
         db.setPassword(pw);
+        // sollte auch ohne jegliche truststores funktionieren --> TODO test!
+
+        db.setRequireSSL(true);
+        db.setUseSSL(true);
     }
 
     /**
