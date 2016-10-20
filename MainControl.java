@@ -49,9 +49,18 @@ public class MainControl {
         // DEBUG
         LOG.setLevel(Level.INFO);
         LOG.addHandler(new StatusBar());
+        readConfig();
 
-        // Parses Required SSL Configuration, if it fails it prints it to stdout
-        // TODO: refactor into Method
+
+        loginView = new LoginForm(this);
+        loginView.setVisible(true);
+    }
+
+    /***
+     * HELFER METHODE!!! NICHT OOC AUSFUERHEN
+     */
+    private void readConfig() {
+        // Parses SSL and other Configuration, if it fails it prints it to stdout
         InputStreamReader inputStreamReader = null;
         BufferedReader configBuffer = null;
         try {
@@ -87,9 +96,6 @@ public class MainControl {
                 System.err.println("Exception: " + e.getMessage());
             }
         }
-
-        loginView = new LoginForm(this);
-        loginView.setVisible(true);
     }
 
     /**
@@ -103,7 +109,7 @@ public class MainControl {
 
     void tryLogin() {
 
-        // TODO server name und datenbank name in die config auslagern! #gegenHardcode!
+        // TODO server name und datenbank name in die config auslagern! (Aber default values behalten) #gegenHardcode!  --> in readConfig #15
 
         //neuer Konstruktor initialize muss vorher ausgeführt werden!
         // ueberpruefung dass auch alles gesetzt wurde!

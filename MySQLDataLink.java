@@ -42,7 +42,7 @@ public class MySQLDataLink implements DataLink {
         db.setDatabaseName(dbname);
         db.setUser(user);
         db.setPassword(pw);
-        // sollte auch ohne jegliche truststores funktionieren --> TODO test!
+        // sollte auch ohne jegliche truststores funktionieren --> TODO test! #13
 
         db.setRequireSSL(true);
         db.setUseSSL(true);
@@ -267,10 +267,7 @@ public class MySQLDataLink implements DataLink {
     public boolean delete(User user) {
         String sql = prepareDeleteStatement(user);
         try (Statement state = link.createStatement()) {
-            if (state.executeUpdate(sql) == 1) {
-                return true;
-            }
-            return false;
+            return state.executeUpdate(sql) == 1;
         } catch (SQLException e) {
             LOG.log(Level.SEVERE, "[SQL] + Failed to delete user '" + user.getUsername()
                     + "'\n" + "[SQL] | Error message: '" + e.getLocalizedMessage()
@@ -284,10 +281,7 @@ public class MySQLDataLink implements DataLink {
     }
 
     public boolean delete(User user, String comment, int amountReceivedInCents) {
-        if (!commitTransaction(new Transaction(user, amountReceivedInCents, comment))) {
-            return false;
-        }
-        return delete(user);
+        return commitTransaction(new Transaction(user, amountReceivedInCents, comment)) && delete(user);
     }
 
     private boolean initBrowser() throws SQLException {
@@ -377,9 +371,8 @@ public class MySQLDataLink implements DataLink {
     }
 
     private String prepareLookupTransactionStatement(User user) {
-        String statement = "SELECT * FROM `transactions` WHERE user=" + 
+        return "SELECT * FROM `transactions` WHERE user=" +
                 user.getUser_id() + " ORDER BY `timestamp` DESC;";
-        return statement;
     }
 
 }

@@ -19,15 +19,18 @@ public class User {
 
 
     /***
+     *
+     * TODO bitte wissen was dieser konstruktor macht? keine user id? (fehlen des wichtigsten primary keys
      * Erstellt einene neuen Nutzer
      * @param username Required
      * @param password Nullable
-     * @param room
-     * @param surname
-     * @param givenName
-     * @param email
-     * @param expirationDate 
+     * @param room Raumnummer (Required)
+     * @param surname Nachname
+     * @param givenName Vorname
+     * @param email Mailaddr (nullable)
+     * @param expirationDate Date for password Expiration, required
      */
+    @Deprecated
     public User(String username, String password, String room, String surname,
             String givenName, String email, String expirationDate) {
         this.username = username;
@@ -43,14 +46,14 @@ public class User {
 
     /***
      * Bitte nicht mehr Verwenden
-     * @param userID
-     * @param username
-     * @param password
-     * @param room
-     * @param surname
-     * @param givenName
-     * @param email
-     * @param expirationDate
+     * @param userID wichtiger primary key, nicht final, aber vermutlich broken wenn geschrieben
+     * @param username unique, nicht nullable
+     * @param password nullable falls nicht neu gesetzt
+     * @param room schluessel kandidat, not null
+     * @param surname nachname
+     * @param givenName vorname
+     * @param email mail, nullable
+     * @param expirationDate Date for password Expiration, required
      * @deprecated
      */
     @Deprecated
@@ -76,16 +79,17 @@ public class User {
     }
 
     /**
-     *
-     * @param dataLink
+     * eklig
+     * @param dataLink soll eine extension eines Links zu einem JDBD sein, fuehrt das insert darauf mit sich selbst aus
      */
     public void update(DataLink dataLink) {
         dataLink.update(this);
         isModified = false;
     }
 
-    /*
-     * @param dataLink   
+    /**
+     * auch eklig
+     * @param dataLink soll eine extension eines Links zu einem JDBD sein, fuehrt das insert darauf mit sich selbst aus
      */
     public void insert(DataLink dataLink) {
         dataLink.insert(this);
@@ -112,7 +116,7 @@ public class User {
      */
     public void extendValidity(DataLink dataLink, String expirationDate,
             Transaction t) {
-        // TODO: sanitize data (expirationDate)
+        // TODO: sanitize data (expirationDate) // TODO bitte nach deutsch uebsersetzen :P
         this.expirationDate = expirationDate;
         this.update(dataLink);
         t.commit(dataLink);
@@ -175,7 +179,7 @@ public class User {
 
     /***
      * Getter for Field
-     * @return 
+     * @return Field value
      */
     public boolean passwordChanged() {
        return this.passwordChanged;
@@ -184,7 +188,7 @@ public class User {
     /***
      * Getter for Field
      * passwordChanged() ist wichtig ansonsten liefert getPassword nur null aus!!!!
-     * @return 
+     * @return password (if changed) else null
      */
     public String getPassword() {
         if(this.passwordChanged)
@@ -194,7 +198,7 @@ public class User {
     
     /***
      * Getter for Field
-     * @return 
+     * @return Field value
      */
     public String getUsername() {
        return this.username;
@@ -202,7 +206,7 @@ public class User {
     
     /***
      * Setter for Field
-     * TODO SCHMERZ (na ja egal)
+     * TODO SCHMERZ (na ja egal) hier fuer muessen wir mal ne iss oeffnen und den code refactoren (prio low)
      */
     public void setUser_id(int user_id) {
        this.user_id = user_id;
@@ -210,7 +214,6 @@ public class User {
 
     /***
      * Setter for Field
-     * @return 
      */
     public void setSurname(String surname) {
         this.surname = surname;
@@ -219,7 +222,6 @@ public class User {
 
     /***
      * Setter for Field
-     * @return 
      */
     public void setGivenname(String givenname) {
         this.givenname = givenname;
@@ -228,7 +230,6 @@ public class User {
 
     /***
      * Setter for Field
-     * @return 
      */
     public void setRoom(String room) {
         this.room = room;
@@ -237,7 +238,6 @@ public class User {
 
     /***
      * Setter for Field
-     * @return 
      */
     public void setEmail(String email) {
         this.email = email;
@@ -246,7 +246,6 @@ public class User {
 
     /***
      * Setter for Field
-     * @return 
      */
     public void setExpirationDate(String expirationDate) {
         this.expirationDate = expirationDate;
@@ -255,7 +254,6 @@ public class User {
     
     /***
      * Setter for Field
-     * @return 
      */
     public void setPassword(String password) {
         this.password = password;
@@ -265,7 +263,7 @@ public class User {
 
     /***
      * Getter for Field
-     * @return 
+     * @return Field value
      */
     public String getSurname() {
         return surname;
@@ -273,7 +271,7 @@ public class User {
 
     /***
      * Getter for Field
-     * @return 
+     * @return Field value
      */
     public String getGivenname() {
         return givenname;
@@ -281,7 +279,7 @@ public class User {
 
     /***
      * Getter for Field
-     * @return 
+     * @return Field value
      */
     public String getRoom() {
         return room;
@@ -289,7 +287,7 @@ public class User {
 
     /***
      * Getter for Field
-     * @return 
+     * @return Field value
      */
     public String getEmail() {
         return email;
@@ -297,7 +295,7 @@ public class User {
 
     /***
      * Getter for Field
-     * @return 
+     * @return Field value
      */
     public String getExpirationDate() {
         return expirationDate;
@@ -305,7 +303,7 @@ public class User {
 
     /***
      * Getter for Field
-     * @return 
+     * @return Field value
      */
     public int getUser_id() {
         return user_id;
@@ -313,7 +311,7 @@ public class User {
 
     /***
      * Getter for Field
-     * @return 
+     * @return Field value
      */
     public boolean isIsModified() {
         return isModified;
