@@ -1,3 +1,4 @@
+# Pfad wird relativ zur .jar angegeben, diese Datei muss sich im gleichen Verzeichnis wie die .jar befinden
 trustStorePath=truststore
 trustStorePassword=
 #keyStorePath=
