@@ -1,4 +1,6 @@
-trustStorePath=
+trustStorePath=truststore
 trustStorePassword=
+#keyStorePath=
+#keyStorePassword=
 #database=radius
 #hostname=shelldon

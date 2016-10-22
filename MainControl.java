@@ -1,3 +1,4 @@
+
 /**
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -7,6 +8,7 @@
 import java.awt.Color;
 import java.awt.Frame;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.Calendar;
@@ -22,15 +24,19 @@ import java.util.List;
 public class MainControl {
 
     /**
-     * Controller class, which contais the programm logic of the tool.
-     * This class handels the different forms and passes events to the database
-     * which occur.
+     * Controller class, which contais the programm logic of the tool. This
+     * class handels the different forms and passes events to the database which
+     * occur.
      */
     public String dbuser;
 
     //Strings set in initialisation
-    private String keyStorePath, keyStorePassword,
-            trustStorePath, trustStorePassword;
+    private String keyStorePath,
+            keyStorePassword,
+            trustStorePath,
+            trustStorePassword,
+            server_hostname = "shelldon",
+            database_name = "radius";
 
     //Static Content
     static private String configurationPath = "configuration.txt";
@@ -51,51 +57,61 @@ public class MainControl {
         LOG.addHandler(new StatusBar());
         readConfig();
 
-
         loginView = new LoginForm(this);
         loginView.setVisible(true);
     }
 
-    /***
+    /**
+     * *
      * HELFER METHODE!!! NICHT OOC AUSFUERHEN
      */
     private void readConfig() {
         // Parses SSL and other Configuration, if it fails it prints it to stdout
         InputStreamReader inputStreamReader = null;
         BufferedReader configBuffer = null;
-        try {
-            inputStreamReader = new InputStreamReader(
-                    new FileInputStream(configurationPath));
-            configBuffer = new BufferedReader(inputStreamReader);
-            String line = configBuffer.readLine();
-            while (line != null) {
-                if (line.startsWith("keyStorePath=")) {
-                    keyStorePath = line.substring(line.indexOf("=") + 1);
-                } else if (line.startsWith("keyStorePassword=")) {
-                    keyStorePassword = line.substring(line.indexOf("=") + 1);
-                } else if (line.startsWith("trustStorePath=")) {
-                    trustStorePath = line.substring(line.indexOf("=") + 1);
-                } else if (line.startsWith("trustStorePassword=")) {
-                    trustStorePassword = line.substring(line.indexOf("=") + 1);
-                }
-
-                line = configBuffer.readLine();
-            }
-
-        } catch (Exception e) {
-            System.out.println("Config (SSL) parsing Failed! Exception: " + e.getMessage());
-        } finally {
+        File configFile = new File(configurationPath);
+        System.out.println("Working Directory = " +
+              System.getProperty("user.dir"));
+        if (configFile.exists() && configFile.isFile()) {
+            System.out.println("file found");
             try {
-                if (inputStreamReader != null) {
-                    inputStreamReader.close();
+                inputStreamReader = new InputStreamReader(
+                        new FileInputStream(configFile));
+                configBuffer = new BufferedReader(inputStreamReader);
+                String line = configBuffer.readLine();
+                while (line != null) {
+                    if (line.startsWith("keyStorePath=")) {
+                        keyStorePath = line.substring(line.indexOf("=") + 1);
+                    } else if (line.startsWith("keyStorePassword=")) {
+                        keyStorePassword = line.substring(line.indexOf("=") + 1);
+                    } else if (line.startsWith("trustStorePath=")) {
+                        trustStorePath = line.substring(line.indexOf("=") + 1);
+                    } else if (line.startsWith("trustStorePassword=")) {
+                        trustStorePassword = line.substring(line.indexOf("=") + 1);
+                    } else if (line.startsWith("hostname=")) {
+                        server_hostname = line.substring(line.indexOf("=") + 1);
+                    } else if (line.startsWith("database=")) {
+                        database_name = line.substring(line.indexOf("=") + 1);
+                    }
+
+                    line = configBuffer.readLine();
                 }
-                if (configBuffer != null) {
-                    configBuffer.close();
-                }
+
             } catch (Exception e) {
-                System.err.println("Exception: " + e.getMessage());
+                System.out.println("Config (SSL) parsing Failed! Exception: " + e.getMessage());
+            } finally {
+                try {
+                    if (inputStreamReader != null) {
+                        inputStreamReader.close();
+                    }
+                    if (configBuffer != null) {
+                        configBuffer.close();
+                    }
+                } catch (Exception e) {
+                    System.err.println("Exception: " + e.getMessage());
+                }
             }
-        }
+        } else System.out.println("no config file found");
     }
 
     /**
@@ -110,22 +126,19 @@ public class MainControl {
     void tryLogin() {
 
         // TODO server name und datenbank name in die config auslagern! (Aber default values behalten) #gegenHardcode!  --> in readConfig #15
-
         //neuer Konstruktor initialize muss vorher ausgeführt werden!
         // ueberpruefung dass auch alles gesetzt wurde!
         if (!(trustStorePath == null || trustStorePassword == null)) {
             if (keyStorePath == null || keyStorePassword == null) {
                 // falls kein client key vorliegt
-                dataSource = new MySQLDataLink("shelldon",
-                        "radius",
+                dataSource = new MySQLDataLink(server_hostname, database_name,
                         loginView.getTxtUser().getText(),
                         String.valueOf(loginView.getTxtPassword().getPassword()),
                         trustStorePath,
                         trustStorePassword);
             } else {
                 // mit client keys
-                dataSource = new MySQLDataLink("shelldon",
-                        "radius",
+                dataSource = new MySQLDataLink(server_hostname, database_name,
                         loginView.getTxtUser().getText(),
                         String.valueOf(loginView.getTxtPassword().getPassword()),
                         keyStorePath,
@@ -137,8 +150,7 @@ public class MainControl {
             //zur DB verbinden
 
             dataSource = new MySQLDataLink(
-                    "shelldon",
-                    "radius",
+                    server_hostname, database_name,
                     loginView.getTxtUser().getText(),
                     String.valueOf(loginView.getTxtPassword().getPassword())
             );
@@ -160,8 +172,8 @@ public class MainControl {
     }
 
     /**
-     * Disable main view and show the edit/create Form.
-     * This is the first step of Creating / Deleting an account.
+     * Disable main view and show the edit/create Form. This is the first step
+     * of Creating / Deleting an account.
      *
      * @param selected The User currently selected, can be null.
      */
@@ -176,8 +188,7 @@ public class MainControl {
     }
 
     /**
-     * Init a creation.
-     * Show the Transaction view and disable main.
+     * Init a creation. Show the Transaction view and disable main.
      *
      * @param u The User-Object with data.
      */
@@ -192,9 +203,9 @@ public class MainControl {
     /**
      * Create a new Account.
      *
-     * @param u       User containing account data.
+     * @param u User containing account data.
      * @param comment Comment on the action
-     * @param amount  Amount received in Cents.
+     * @param amount Amount received in Cents.
      */
     void commitCreate(User u, String comment, int amount) {
         //Daten zur DB senden
@@ -208,8 +219,7 @@ public class MainControl {
     }
 
     /**
-     * Init an update action.
-     * Show the Update Form and disable the Main View.
+     * Init an update action. Show the Update Form and disable the Main View.
      *
      * @param u The User to update.
      */
@@ -224,9 +234,9 @@ public class MainControl {
     /**
      * Update a User record.
      *
-     * @param u       The User to update.
+     * @param u The User to update.
      * @param comment Comment on the Action
-     * @param amount  Amount received in cents.
+     * @param amount Amount received in cents.
      */
     void commitUpdate(User u, String comment, int amount) {
         if (dataSource.update(u, comment, amount) != -1) {
@@ -238,8 +248,7 @@ public class MainControl {
     }
 
     /**
-     * Start a deleting action.
-     * Show Transaction Form and disable Main Form.
+     * Start a deleting action. Show Transaction Form and disable Main Form.
      *
      * @param u The User to be deleted.
      */
@@ -253,9 +262,9 @@ public class MainControl {
     /**
      * Delete a user record.
      *
-     * @param u       The User to be deleted.
+     * @param u The User to be deleted.
      * @param comment Comment on the action.
-     * @param amount  Amount received in Cents.
+     * @param amount Amount received in Cents.
      */
     void commitDelete(User u, String comment, int amount) {
         dataSource.delete(u, comment, amount);
@@ -264,8 +273,8 @@ public class MainControl {
     }
 
     /**
-     * Start an extending action.
-     * Shows the transaction form and disables the Main View.
+     * Start an extending action. Shows the transaction form and disables the
+     * Main View.
      *
      * @param u The User to be extended.
      */
@@ -279,9 +288,9 @@ public class MainControl {
     /**
      * Extend a users validity.
      *
-     * @param u       The user.
+     * @param u The user.
      * @param comment Comment to the action.
-     * @param amount  Money recieved in cents.
+     * @param amount Money recieved in cents.
      */
     void commitExtend(User u, String comment, int amount) {
         if (dataSource.update(u, comment, amount) != -1) {
@@ -309,8 +318,8 @@ public class MainControl {
     }
 
     /**
-     * Re-Enables the Main view. (e.g. after a sub-form is closed and
-     * Control is passed back to Main.
+     * Re-Enables the Main view. (e.g. after a sub-form is closed and Control is
+     * passed back to Main.
      */
     public void enableMain() {
         this.mainView.setEnabled(true);
@@ -319,17 +328,15 @@ public class MainControl {
         mainView.updateBrowserView();
     }
 
-
     //EXP DATE CALCULATION METHODS
-
     /**
      * Get the next or an expiration date terms ahead for "Extend Validity".
-     * From January to February this will be Apr 30 in the same year.
-     * From March to August this will be Oct 31 in the same year.
-     * From September to December this will be Apr 30 next year.
+     * From January to February this will be Apr 30 in the same year. From March
+     * to August this will be Oct 31 in the same year. From September to
+     * December this will be Apr 30 next year.
      *
-     * @param terms Number of terms to extend. Default 0, otherwise 6 month
-     *              will be addes to the next exp date.
+     * @param terms Number of terms to extend. Default 0, otherwise 6 month will
+     * be addes to the next exp date.
      * @return String representation of the expiration date.
      */
     public String getNextExpDate(int terms) {
@@ -340,13 +347,11 @@ public class MainControl {
         //Sommersemester, validate until october
         if (month >= 2 && month <= 7) {
             ret = c.get(Calendar.YEAR) + "-10-31";
+        } else //Wintersemester, valdiate until april
+        if (month > 7) {
+            ret = (c.get(Calendar.YEAR) + 1) + "-04-30";
         } else {
-            //Wintersemester, valdiate until april
-            if (month > 7) {
-                ret = (c.get(Calendar.YEAR) + 1) + "-04-30";
-            } else {
-                ret = (c.get(Calendar.YEAR)) + "-04-30";
-            }
+            ret = (c.get(Calendar.YEAR)) + "-04-30";
         }
         return ret;
     }
@@ -361,9 +366,8 @@ public class MainControl {
     }
 
     /**
-     * Get the first expiration date for a newly create account.
-     * In month between March and Aug. it is set to Apr 30.
-     * Else to Oct. 31.
+     * Get the first expiration date for a newly create account. In month
+     * between March and Aug. it is set to Apr 30. Else to Oct. 31.
      *
      * @return The expiration date
      */
@@ -372,11 +376,11 @@ public class MainControl {
     }
 
     //LOGGING
-
     /**
      * Status Bar down on the Main Form.
      */
     public class StatusBar extends StreamHandler {
+
         /**
          * Publish a logging message (show it on the status bar)
          *

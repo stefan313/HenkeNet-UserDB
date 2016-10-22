@@ -1,20 +1,17 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /**
  *
- * @author nick
+ * @author nick, stefan
  */
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Properties;
 import java.util.logging.*;
 
 public class MySQLDataLink implements DataLink {
@@ -27,8 +24,8 @@ public class MySQLDataLink implements DataLink {
     private final static Logger LOG = Logger.getLogger("*");
 
     /**
-     * *
-     * Beschreibt einen DataLink (ohne!! RequireSSL und UseSSL)
+     * 
+     * Beschreibt einen DataLink 
      *
      * @param server der benutzte Server
      * @param dbname die benutze Datenbank
@@ -37,21 +34,24 @@ public class MySQLDataLink implements DataLink {
      */
     @Deprecated
     public MySQLDataLink(String server, String dbname, String user, String pw) {
+        LOG.warning("Using Link with no keystore and no truststore");
         db = new MysqlDataSource();
         db.setServerName(server);
         db.setDatabaseName(dbname);
         db.setUser(user);
         db.setPassword(pw);
-        // sollte auch ohne jegliche truststores funktionieren --> TODO test! #13
+        // sollte auch ohne jegliche truststores funktionieren --> TODO test! #13 vermutlich nicht?
 
         db.setRequireSSL(true);
+        // ohne truststore nicht möglich
+        //db.setVerifyServerCertificate(true);
         db.setUseSSL(true);
     }
 
     /**
-     * *
-     *
-     * Mit einem KeyStore des Benutzers
+     * 
+     * NOT YET TESTED OR IMPLEMENTED! Mit einem KeyStore des Benutzers
+     * Möglicherweise muss hier der Server dem Client vertrauen?
      * @param server der benutzte Server
      * @param dbname die benutze Datenbank
      * @param user der username
@@ -63,13 +63,17 @@ public class MySQLDataLink implements DataLink {
      * Servers
      * @param trustStorePassword das Passwort dazu
      */
-    public MySQLDataLink( String server,  String dbname,  String user,
-             String pw,  String keyStorePath,  String keyStorePassword,
-             String trustStorePath,  String trustStorePassword) {
-        System.setProperty("javax.net.ssl.keyStore", keyStorePath);
-        System.setProperty("javax.net.ssl.keyStorePassword", keyStorePassword);
-        System.setProperty("javax.net.ssl.trustStore", trustStorePath);
-        System.setProperty("javax.net.ssl.trustStorePassword", trustStorePassword);
+    public MySQLDataLink(String server, String dbname, String user,
+            String pw, String keyStorePath, String keyStorePassword,
+            String trustStorePath, String trustStorePassword) {
+        LOG.warning("Using Link with keystore and truststore");
+        Properties pr = System.getProperties();
+        pr.setProperty("javax.net.ssl.keyStore", keyStorePath);
+        pr.setProperty("javax.net.ssl.keyStorePassword", keyStorePassword);
+        pr.setProperty("javax.net.ssl.trustStore", trustStorePath);
+        pr.setProperty("javax.net.ssl.trustStorePassword", trustStorePassword);
+        // nicht unbedingt nötig
+        //pr.setProperty("javax.net.debug", "all");
         db = new MysqlDataSource();
         db.setServerName(server);
         db.setDatabaseName(dbname);
@@ -78,11 +82,12 @@ public class MySQLDataLink implements DataLink {
         db.setRequireSSL(true);
         db.setUseSSL(true);
     }
-    
+
     /**
      * *
      *
      * Enthält keine KeyStores!!! SSL cert vom server aus only
+     *
      * @param server der benutzte Server
      * @param dbname die benutze Datenbank
      * @param user der username
@@ -91,11 +96,13 @@ public class MySQLDataLink implements DataLink {
      * Servers
      * @param trustStorePassword das Passwort dazu
      */
-    public MySQLDataLink( String server,  String dbname,  String user,
-             String pw,
-             String trustStorePath,  String trustStorePassword) {
-        System.setProperty("javax.net.ssl.trustStore", trustStorePath);
-        System.setProperty("javax.net.ssl.trustStorePassword", trustStorePassword);
+    public MySQLDataLink(String server, String dbname, String user,
+            String pw,
+            String trustStorePath, String trustStorePassword) {
+        LOG.warning("Using Link with no keystore and with truststore");
+        Properties pr = System.getProperties();
+        pr.setProperty("javax.net.ssl.trustStore", trustStorePath);
+        pr.setProperty("javax.net.ssl.trustStorePassword", trustStorePassword);
         db = new MysqlDataSource();
         db.setServerName(server);
         db.setDatabaseName(dbname);
@@ -108,8 +115,25 @@ public class MySQLDataLink implements DataLink {
     public boolean connect() {
         try {
             link = db.getConnection();
+            
+            // TODO nach testen löschen!
+            ResultSet resultSet = link.createStatement().executeQuery("SHOW STATUS LIKE 'Ssl_cipher';");
+            ResultSetMetaData rsmd = resultSet.getMetaData();
+            int columnsNumber = rsmd.getColumnCount();
+            while (resultSet.next()) {
+                for (int i = 1; i <= columnsNumber; i++) {
+                    if (i > 1) {
+                        System.out.print(",  ");
+                    }
+                    String columnValue = resultSet.getString(i);
+                    System.out.print(columnValue + " " + rsmd.getColumnName(i));
+                }
+                System.out.println("");
+            }
+            
             return true;
         } catch (SQLException e) {
+            System.err.println(e.getMessage());
             LOG.log(Level.SEVERE, "[SQL] Failed to connect.", e);
             return false;
         }
@@ -172,11 +196,11 @@ public class MySQLDataLink implements DataLink {
             return -1;
         }
     }
-   
+
     public int update(User user, String comment) {
         return update(user, comment, 0);
     }
-    
+
     public int update(User user, String comment, int amountReceivedInCents) {
         if (!commitTransaction(new Transaction(user, amountReceivedInCents, comment))) {
             return -1;
@@ -308,8 +332,7 @@ public class MySQLDataLink implements DataLink {
 
         statement += "username='" + u.getUsername() + "',";
         // passwordChanged() ist wichtig ansonsten liefert getPassword nur null aus!!!!
-        if(u.passwordChanged())
-        {
+        if (u.passwordChanged()) {
             statement += "password='" + u.getPassword() + "',";
         }
         statement += "room='" + u.getRoom() + "',";
@@ -330,19 +353,18 @@ public class MySQLDataLink implements DataLink {
         statement += "surname='" + u.surname + "',";
         statement += "givenname='" + u.givenname + "',";
         statement += "email='" + u.email + "',";
-*/
+         */
         statement += "username='" + u.getUsername() + "',";
-        
+
         // passwordChanged() ist wichtig ansonsten liefert getPassword nur null aus!!!!
-        if(u.passwordChanged())
-        {
+        if (u.passwordChanged()) {
             statement += "password='" + u.getPassword() + "',";
         }
         statement += "room='" + u.getRoom() + "',";
         statement += "surname='" + u.getSurname() + "',";
         statement += "givenname='" + u.getGivenname() + "',";
         statement += "email='" + u.getEmail() + "',";
-        
+
         statement += "expiration_date="
                 + (u.getExpirationDate().isEmpty()
                         ? "NULL"
@@ -375,8 +397,8 @@ public class MySQLDataLink implements DataLink {
 
     private String prepareLookupTransactionStatement(User user) {
         // returns this lookup statement string on userid
-        return "SELECT * FROM `transactions` WHERE user=" +
-                user.getUser_id() + " ORDER BY `timestamp` DESC;";
+        return "SELECT * FROM `transactions` WHERE user="
+                + user.getUser_id() + " ORDER BY `timestamp` DESC;";
     }
 
 }
