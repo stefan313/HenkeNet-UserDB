@@ -12,5 +12,8 @@ truststore: ca-cert.pem server-cert.pem
 	keytool -import -alias myServerCert -file server-cert.pem -keystore truststore
 	echo "update configuration.txt!"
 
-clean_all:
-	
+clean_java:
+	rm -rfv build/
+	rm -fv HenkeNet-UserTool.jar
+	rm java_compile.log
+	rm -fv java_build.log
