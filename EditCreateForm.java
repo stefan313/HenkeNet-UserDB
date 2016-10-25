@@ -1,5 +1,4 @@
 
-import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
@@ -348,6 +347,11 @@ public class EditCreateForm extends javax.swing.JFrame {
     private javax.swing.JLabel txtStatusBar;
     // End of variables declaration//GEN-END:variables
 
+    /**
+     * meh!!!
+     * hier wird aus einem alten user ein neuer generiert! fehleranfällig! --> password wird extra gesetzt!
+     * @return einen neuen User mit den aktuellen Daten des alten
+     */
     private User fetchData(){
         if (this.getTextFieldRoomNumber1().getText().length() != 2
                     || this.getTextFieldRoomNumber2().getText().length() != 2
@@ -367,16 +371,25 @@ public class EditCreateForm extends javax.swing.JFrame {
                     username = getTextFieldUsername().getText(),
                     password = String.valueOf(getPasswordField().getPassword()),
                     expyDate = getTextFieldExpDate().getText();
-            //Daten checken
+            //Daten (passwort) checken
             if (!password.equals(String.valueOf(getPasswordFieldCheck().getPassword()))) {
                 LOG.log(Level.WARNING, "[FAIL] Passwords do not match.");
                 return null;
             }
-            if (password.equalsIgnoreCase("")
-                    || username.equalsIgnoreCase("")) {
-                LOG.log(Level.WARNING, "[FAIL] Password is empty.");
+            //username auf vorhanden sein checken ( gäbe sonst eh mysql error )
+            if (username.equalsIgnoreCase("")) {
+                LOG.log(Level.WARNING, "[FAIL] username is empty.");
+                //failer!
                 return null;
             }
+            User ret = new User(username, /*password, */ roomnumber, nachname, vorname, email, expyDate);
+            if (password.equalsIgnoreCase("")
+                    || username.equalsIgnoreCase("")) {
+                LOG.log(Level.INFO, "[INFO] Password is empty.");
+                //man muss ja nicht immer das pw ziehen und gleich wieder zurück schreiben wie den ganzen anderen shit --> unnötige buganfällige IO-Vorgänge
+                //return null;
+                //falls pw nicht leer ist neues passwort in die datenbank feuern,... hätte man eleganter modellieren sollen
+            } else ret.setPassword(password);
             
             /* if (expyDate.equalsIgnoreCase("")){
              *    LOG.log(Level.WARNING, "[FAIL] Expiration date is empty.");
@@ -384,7 +397,8 @@ public class EditCreateForm extends javax.swing.JFrame {
              *}
              * // we may want to set an empty expiration date.
              */
-            User ret = new User(username, password, roomnumber, nachname, vorname, email, expyDate);
+            
+            
             return ret;
     }
     
