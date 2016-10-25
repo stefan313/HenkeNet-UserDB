@@ -1,7 +1,7 @@
 jc=javac
 cp= cp -fv
 mysqlpath=mysql.jar
-.PHONY: all clean-java clean-all depoy
+.PHONY: all clean-java clean-all deploy clean-truststore
 
 all: deploy clean-java
 
@@ -21,7 +21,7 @@ deploy: HenkeNet-UserTool.jar truststore configuration.txt
 	${cp} configuration.txt deploy/
 	${cp} ${mysqlpath} deploy/mysql-deploy.jar
 
-clean-all: clean-java clean-deploy
+clean-all: clean-java clean-deploy clean-truststore
 
 clean-java:
 	rm -fv *.class
@@ -31,3 +31,6 @@ clean-java:
 
 clean-deploy:
 	rm -rfv deploy
+
+clean-truststore:
+	rm -fv truststore
