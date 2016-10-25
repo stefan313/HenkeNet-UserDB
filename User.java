@@ -31,10 +31,10 @@ public class User {
      * @param expirationDate Date for password Expiration, required
      */
     @Deprecated
-    public User(String username, String password, String room, String surname,
+    public User(String username, /*String password,*/ String room, String surname,
             String givenName, String email, String expirationDate) {
         this.username = username;
-        this.password = password;
+        //this.password = password;
         this.surname = surname;
         this.givenname = givenName;
         this.room = room;
@@ -57,7 +57,7 @@ public class User {
      * @deprecated
      */
     @Deprecated
-    public User(int userID, String username, String password, String room,
+    public User(int userID, String username, /*String password, */ String room,
             String surname, String givenName, String email, String expirationDate) {
         // "User" instances with a given id refer to ones already existing
         // in the DB, hence the usual constructor is called and afterwards
@@ -68,7 +68,7 @@ public class User {
         // aufrufen kann.
         // Java ist einfach scheisse! nehmen wir C++?
         this.username = username;
-        this.password = password;
+        //this.password = password;
         this.surname = surname;
         this.givenname = givenName;
         this.room = room;

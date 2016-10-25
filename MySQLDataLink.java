@@ -250,7 +250,7 @@ public class MySQLDataLink implements DataLink {
                         new User(
                                 Integer.parseInt(result.getString("id")),
                                 result.getString("username"),
-                                "",
+                                //"",
                                 result.getString("room"),
                                 result.getString("surname"),
                                 result.getString("givenname"),
@@ -381,6 +381,7 @@ public class MySQLDataLink implements DataLink {
          * id is unique, so as not to losemore data than intended.
          * since `users`.`id` is PK/UNIQ/AI, a WHERE `id` = '%id'
          * should suffice.
+	 * gute idee: problem: im java model User.java ist das ding leider überschreibbar, da es an einer stelle ^f "dirty hack" gesetzt wird!
          */
 
         return "DELETE FROM `users` WHERE `id` = '" + user.getUser_id() + "'";
